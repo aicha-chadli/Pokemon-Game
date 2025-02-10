@@ -7,7 +7,7 @@ class Pokemon:
         self.life_points = life_points
         self.level = level  # 
         self.attack_power = attack_power
-        self.defense = defense
+        self.defense = defense 
         self.evolution = evolution    # "baby", "teen", "adult"
         self.type = type    # water, fire, grass & normal
         # GUI attributes
