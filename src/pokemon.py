@@ -10,11 +10,11 @@ class Pokemon:
         self.defense = defense
         self.type = type    # water, fire, grass, electric & normal
         # GUI attributes
-        self.image = pygame.image.load("player.png")
-        self.image
-        self.rect = self.image.get_rect(x=x, y=y)
-        self.speed = 5
-        self.velocity = [0, 0]  # x, y, x horizontal & vertical control.
+        #self.image = pygame.image.load("player.png")
+        #self.image
+        #self.rect = self.image.get_rect(x=x, y=y)
+        #self.speed = 5
+        #self.velocity = [0, 0]  # x, y, x horizontal & vertical control.
                                 # 0 is no movement. 
                                 # Accelere if positive, decelere if negative.
 
