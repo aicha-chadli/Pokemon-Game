@@ -1,0 +1,8 @@
+{
+    "Charmander": {
+        "type": "fire",
+        "attack_power": 52,
+        "defense": 43,
+        "life_points": -8.5
+    }
+}

@@ -3,8 +3,8 @@ import os
 from pokemon import Pokemon
 
 # Verificar si los archivos existen antes de intentar abrirlos
-pokemon_json_path = os.path.abspath("pokemon.json")
-pokedex_json_path = os.path.abspath("pokedex.json")
+pokemon_json_path = os.path.abspath("data\pokemon.json")
+pokedex_json_path = os.path.abspath("data\pokedex.json")
 
 if not os.path.exists(pokemon_json_path):
     raise FileNotFoundError(f"No such file or directory: '{pokemon_json_path}'")
@@ -13,8 +13,13 @@ if not os.path.exists(pokedex_json_path):
 
 with open(pokemon_json_path, "r") as file:
     pokemon_json = json.load(file)
-with open(pokedex_json_path, "r") as file:
-    pokedex_json = json.load(file)
+
+# Manejar el caso en que pokedex.json esté vacío o no contenga un JSON válido
+try:
+    with open(pokedex_json_path, "r") as file:
+        pokedex_json = json.load(file)
+except json.JSONDecodeError:
+    pokedex_json = {}
 
 class Combat():
     def __init__(self, player, enemy):
