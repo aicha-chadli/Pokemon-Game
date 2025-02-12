@@ -1,8 +1,19 @@
 {
     "Charmander": {
-        "type": "fire",
+        "types": [
+            "fire"
+        ],
         "attack_power": 52,
         "defense": 43,
-        "life_points": -8.5
+        "life_points": -8
+    },
+    "Pikachu": {
+        "types": [
+            "electric",
+            "ghost"
+        ],
+        "attack_power": 55,
+        "defense": 40,
+        "life_points": 100
     }
 }
