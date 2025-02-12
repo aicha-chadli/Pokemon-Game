@@ -1,106 +1,93 @@
 import pygame
-import json
-import requests
-from io import BytesIO
-from poke_api import get_pokemon_info
+from game import Game
+from pokemon import Pokemon
+from pokedex import Pokedex
+from utils import draw_text, draw_button
 
-# Initialisation de pygame
-pygame.init()
-screen = pygame.display.set_mode((800, 600))
-font = pygame.font.Font(None, 36)
+class MainMenu:
+    def __init__(self, screen):
+        self.screen = screen
+        self.background = pygame.image.load("background_pokemon.jpg")  # Fond pour l'accueil
+        self.background = pygame.transform.scale(self.background, (800, 600))
+        self.pokedex = Pokedex()
 
-# Charger le Pokédex depuis un fichier JSON
-def load_pokedex():
-    try:
-        with open("pokedex.json", "r") as file:
-            return json.load(file)
-    except FileNotFoundError:
-        return []
+    def run(self):
+        running = True
+        while running:
+            self.screen.blit(self.background, (0, 0))  # Utiliser le fond d'accueil
+            draw_text(self.screen, "1. Lancer une partie", 300, 200)
+            draw_text(self.screen, "2. Ajouter un Pokémon", 300, 250)
+            draw_text(self.screen, "3. Voir le Pokédex", 300, 300)
+            draw_text(self.screen, "4. Quitter", 300, 350)
 
-def save_pokedex(pokedex):
-    with open("pokedex.json", "w") as file:
-        json.dump(pokedex, file, indent=4)
+            pygame.display.flip()
 
-pokedex = load_pokedex()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_1:
+                        self.launch_game()
+                    elif event.key == pygame.K_2:
+                        self.add_pokemon()
+                    elif event.key == pygame.K_3:
+                        self.view_pokedex()
+                    elif event.key == pygame.K_4:
+                        running = False
 
-# Fonction pour ajouter un Pokémon au Pokédex
-def add_pokemon_to_pokedex(pokemon_name):
-    global pokedex
-    pokemon_data = get_pokemon_info(pokemon_name)
-    if pokemon_data and pokemon_name.lower() not in [p["name"].lower() for p in pokedex]:
-        pokedex.append(pokemon_data)
-        save_pokedex(pokedex)
+    def launch_game(self):
+        input_text = ""
+        selected_pokemon = None
+        running = True
 
-# Fonction pour afficher un menu
-def draw_text(text, x, y):
-    label = font.render(text, True, (255, 255, 255))
-    screen.blit(label, (x, y))
+        while running:
+            self.screen.blit(self.background, (0, 0))  # Fond d'accueil pendant la sélection
+            draw_text(self.screen, "Entrez le nom du Pokémon :", 200, 100)
+            draw_text(self.screen, input_text, 300, 150)
+            draw_text(self.screen, "Appuyez sur Entrée pour valider", 200, 200)
 
-def launch_game():
-    input_text = ""
-    active = False
-    selected_pokemon = None
-    
-    running_game = True
-    while running_game:
-        screen.fill((0, 0, 0))
-        draw_text("Entrez le nom du Pokémon :", 200, 100)
-        draw_text(input_text, 300, 150)
-        draw_text("Appuyez sur Entrée pour valider", 200, 200)
-        
-        if selected_pokemon:
-            draw_text(f"{selected_pokemon['name']}", 400, 300)
-            y_offset = 350
-            for stat, value in selected_pokemon["stats"].items():
-                draw_text(f"{stat}: {value}", 400, y_offset)
-                y_offset += 30
-            response = requests.get(selected_pokemon["sprite"])
-            pokemon_image = pygame.image.load(BytesIO(response.content))
-            screen.blit(pokemon_image, (500, 250))
-            draw_text("Appuyez sur C pour choisir ce Pokémon", 200, 550)
-        
-        pygame.display.flip()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running_game = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running_game = False
-                elif event.key == pygame.K_RETURN:
-                    selected_pokemon = get_pokemon_info(input_text)
-                elif event.key == pygame.K_BACKSPACE:
-                    input_text = input_text[:-1]
-                elif event.key == pygame.K_c and selected_pokemon:
-                    print(f"{selected_pokemon['name']} sélectionné pour le combat !")
-                    running_game = False
-                else:
-                    input_text += event.unicode
+            if selected_pokemon:
+                # Afficher les caractéristiques du Pokémon
+                draw_text(self.screen, f"{selected_pokemon.name.capitalize()}", 400, 300)
+                draw_text(self.screen, f"Type(s) : {', '.join(selected_pokemon.types).capitalize()}", 400, 330)
 
-running = True
-while running:
-    screen.fill((0, 0, 0))
-    draw_text("1. Lancer une partie", 300, 200)
-    draw_text("2. Ajouter un Pokémon", 300, 250)
-    draw_text("3. Voir le Pokédex", 300, 300)
-    draw_text("4. Quitter", 300, 350)
+                y_offset = 360
+                for stat, value in selected_pokemon.stats.items():
+                    draw_text(self.screen, f"{stat.capitalize()}: {value}", 400, y_offset)
+                    y_offset += 30
 
-    pygame.display.flip()
+                # Afficher l'image du Pokémon
+                if selected_pokemon.image:
+                    self.screen.blit(selected_pokemon.image, (500, 250))  # Afficher l'image à droite
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_1:
-                launch_game()
-            elif event.key == pygame.K_2:
-                pokemon_name = input("Entrez le nom du Pokémon : ")
-                add_pokemon_to_pokedex(pokemon_name)
-            elif event.key == pygame.K_3:
-                print("--- Pokédex ---")
-                for p in pokedex:
-                    print(f"{p['name']} - Attaque: {p['stats']['attack']}, Défense: {p['stats']['defense']}, PV: {p['stats']['hp']}")
-            elif event.key == pygame.K_4:
-                running = False
+                draw_text(self.screen, "Appuyez sur C pour choisir ce Pokémon", 200, 550)
 
-pygame.quit()
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        running = False
+                    elif event.key == pygame.K_RETURN:
+                        # Valider le Pokémon entré
+                        selected_pokemon = Pokemon(input_text)
+                    elif event.key == pygame.K_BACKSPACE:
+                        input_text = input_text[:-1]
+                    elif event.key == pygame.K_c and selected_pokemon:
+                        # Lancer le jeu avec le Pokémon choisi
+                        game = Game(self.screen, selected_pokemon)
+                        game.run()
+                        running = False
+                    else:
+                        input_text += event.unicode
+
+    def add_pokemon(self):
+        pokemon_name = input("Entrez le nom du Pokémon : ")
+        self.pokedex.add_pokemon(pokemon_name)
+
+    def view_pokedex(self):
+        print("--- Pokédex ---")
+        for p in self.pokedex.pokedex:
+            print(f"{p['name']} - Type(s): {', '.join(p['types'])} - PV: {p['stats']['hp']}")
