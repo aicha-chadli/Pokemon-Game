@@ -1,22 +1,28 @@
+import requests
+from io import BytesIO
 import pygame
 
 class Pokemon:
-    def __init__(self, name, life_points, level, attack_power, defense, types, x, y):
-        # Character attributes
-        self.name = name
-        self.life_points = life_points
-        self.level = level  # 
-        self.attack_power = attack_power
-        self.defense = defense
-        self.types = types    # water, fire, grass, electric & normal
-        # GUI attributes
-        #self.image = pygame.image.load("player.png")
-        #self.image
-        #self.rect = self.image.get_rect(x=x, y=y)
-        #self.speed = 5
-        #self.velocity = [0, 0]  # x, y, x horizontal & vertical control.
-                                # 0 is no movement. 
-                                # Accelere if positive, decelere if negative.
+    def __init__(self, name):
+        self.name = name.lower()
+        self.data = self._fetch_pokemon_data()
+        self.types = self.data.get("types", [])
+        self.stats = self.data.get("stats", {})
+        self.image = self._load_image()
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)  # displays the player's image on the screen at the position of the rectangle
+    def _fetch_pokemon_data(self):
+        response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{self.name}")
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "types": [t["type"]["name"] for t in data["types"]],
+                "stats": {s["stat"]["name"]: s["base_stat"] for s in data["stats"]},
+            }
+        return {}
+
+    def _load_image(self):
+        response = requests.get(f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{self.name}.png")
+        if response.status_code == 200:
+            image = pygame.image.load(BytesIO(response.content))
+            return pygame.transform.scale(image, (100, 100))
+        return None
