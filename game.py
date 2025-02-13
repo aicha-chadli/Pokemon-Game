@@ -8,7 +8,7 @@ class Game:
         self.screen = screen
         self.player_pokemon = player_pokemon
         self.opponent_pokemon = self._get_random_pokemon(player_pokemon.name)  # Passer le nom du Pokémon du joueur
-        self.background = pygame.image.load("background_pokemon.jpg")
+        self.background = pygame.image.load("battle_pokemon.jpg")
         self.background = pygame.transform.scale(self.background, (800, 600))
 
     def _get_random_pokemon(self, excluded_pokemon_name):
@@ -29,8 +29,8 @@ class Game:
         running = True
         while running:
             self.screen.blit(self.background, (0, 0))
-            draw_text(self.screen, f"Votre Pokémon: {self.player_pokemon.name}", 50, 50)
-            draw_text(self.screen, f"Adversaire: {self.opponent_pokemon.name}", 50, 100)
+            draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name}", 50, 50)
+            draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name}", 50, 100)
 
             if self.player_pokemon.image:
                 self.screen.blit(self.player_pokemon.image, (100, 200))
