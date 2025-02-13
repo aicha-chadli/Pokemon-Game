@@ -2,7 +2,7 @@ import pygame
 from game import Game
 from pokemon import Pokemon
 from pokedex import Pokedex
-from utils import draw_text, draw_button
+from utils import draw_text, draw_button, draw_bordered_rect
 
 class MainMenu:
     def __init__(self, screen):
@@ -47,7 +47,8 @@ class MainMenu:
             draw_text(self.screen, "Appuyez sur Entrée pour valider", 200, 200)
 
             if selected_pokemon:
-                # Afficher les caractéristiques du Pokémon
+                # Cadre pour les caractéristiques du Pokémon
+                draw_bordered_rect(self.screen, 390, 290, 350, 250, (255, 255, 255), (0, 0, 0))  # Bordure blanche avec contour noir
                 draw_text(self.screen, f"{selected_pokemon.name.capitalize()}", 400, 300)
                 draw_text(self.screen, f"Type(s) : {', '.join(selected_pokemon.types).capitalize()}", 400, 330)
 
@@ -56,8 +57,9 @@ class MainMenu:
                     draw_text(self.screen, f"{stat.capitalize()}: {value}", 400, y_offset)
                     y_offset += 30
 
-                # Afficher l'image du Pokémon
+                # Cadre pour l'image du Pokémon
                 if selected_pokemon.image:
+                    draw_bordered_rect(self.screen, 490, 240, 120, 120, (255, 255, 255), (0, 0, 0))  # Bordure blanche avec contour noir
                     self.screen.blit(selected_pokemon.image, (500, 250))  # Afficher l'image à droite
 
                 draw_text(self.screen, "Appuyez sur C pour choisir ce Pokémon", 200, 550)
