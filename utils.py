@@ -1,6 +1,6 @@
 import pygame
 
-def draw_text(screen, text, x, y, font_size=36, color=(255, 0, 0)):
+def draw_text(screen, text, x, y, font_size=36, color=(255, 255, 255)):
     font = pygame.font.Font(None, font_size)
     label = font.render(text, True, color)
     screen.blit(label, (x, y))

@@ -36,9 +36,8 @@ class MainMenu:
         
         while running:
             self.screen.fill((0, 0, 0))  # Fond noir (black background for Pokémon selection)
-            draw_text(self.screen, "Utilisez <- et -> pour choisir un Pokémon", 200, 100)
-            draw_text(self.screen, "Appuyez sur C pour valider", 200, 150)
-            
+            draw_text(self.screen, "Use <-- and --> to chose a Pokémon", 200, 100)
+            draw_text(self.screen, "Press C to validate", 200, 150)
             draw_text(self.screen, selected_pokemon.name.capitalize(), 350, 200)
             
             if selected_pokemon.image:
