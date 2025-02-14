@@ -3,6 +3,7 @@ import random
 import math
 from pokemon import Pokemon
 from utils import draw_text
+from combat import Combat
 
 class Game:
     def __init__(self, screen, player_pokemon):
@@ -11,22 +12,19 @@ class Game:
         self.opponent_pokemon = self._get_random_pokemon(player_pokemon.name)
         self.background = pygame.image.load("battle_pokemon.jpg")
         self.background = pygame.transform.scale(self.background, (800, 600))
-
-        # Scaling factor to make Pokémon bigger
         self.scale_factor = 2
-
-        # Resize Pokémon images
         self.player_pokemon.image = pygame.transform.scale(self.player_pokemon.image, 
-                                                           (self.player_pokemon.image.get_width() * self.scale_factor, 
-                                                            self.player_pokemon.image.get_height() * self.scale_factor))
+                                                          (self.player_pokemon.image.get_width() * self.scale_factor, 
+                                                           self.player_pokemon.image.get_height() * self.scale_factor))
         self.opponent_pokemon.image = pygame.transform.scale(self.opponent_pokemon.image, 
-                                                            (self.opponent_pokemon.image.get_width() * self.scale_factor, 
-                                                             self.opponent_pokemon.image.get_height() * self.scale_factor))
-
-        # Timer pour l'oscillation
+                                                             (self.opponent_pokemon.image.get_width() * self.scale_factor, 
+                                                              self.opponent_pokemon.image.get_height() * self.scale_factor))
         self.time = 0
-        self.amplitude = 10  # Amplitude de l'oscillation
-        self.speed = 0.05  # Vitesse de l'oscillation
+        self.amplitude = 10
+        self.speed = 0.05
+        self.combat = Combat(self.player_pokemon, self.opponent_pokemon)
+        self.turn = self.player_pokemon if self.player_pokemon.stats["speed"] > self.opponent_pokemon.stats["speed"] else self.opponent_pokemon
+        self.game_over = False
 
     def _get_random_pokemon(self, excluded_pokemon_name):
         pokemon_list = ["pikachu", "bulbasaur", "charmander", "squirtle", "jigglypuff", "eevee", "snorlax", "mewtwo"]
@@ -47,25 +45,58 @@ class Game:
             draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 50, 50)
             draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 50, 100)
 
-            # Calcul de l'oscillation
             self.time += self.speed
-            oscillation = math.sin(self.time) * self.amplitude  # Valeur oscillante
+            oscillation = math.sin(self.time) * self.amplitude
 
-            # Positions des Pokémon avec oscillation
             player_x, player_y = 100, 300 + oscillation
-            opponent_x, opponent_y = 550, 300 - oscillation  # Oscille en opposition
+            opponent_x, opponent_y = 550, 300 - oscillation
 
             if self.player_pokemon.image:
                 self.screen.blit(self.player_pokemon.image, (player_x, player_y))
             if self.opponent_pokemon.image:
                 self.screen.blit(self.opponent_pokemon.image, (opponent_x, opponent_y))
 
+            if not self.game_over:
+                if self.turn == self.player_pokemon:
+                    draw_text(self.screen, "1. Attack", 50, 500)
+                    draw_text(self.screen, "2. Defend", 200, 500)
+                else:
+                    self.opponent_attack()
+                    self.turn = self.player_pokemon
+
             pygame.display.flip()
-            clock.tick(60)  # 60 FPS
+            clock.tick(60)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        running = False
+                    if event.key == pygame.K_1 and self.turn == self.player_pokemon:
+                        self.player_attack()
+                        self.turn = self.opponent_pokemon
+                    elif event.key == pygame.K_2 and self.turn == self.player_pokemon:
+                        self.player_defend()
+                        self.turn = self.opponent_pokemon
+
+            if self.player_pokemon.stats["hp"] <= 0 or self.opponent_pokemon.stats["hp"] <= 0:
+                self.game_over = True
+                winner = self.player_pokemon.name if self.opponent_pokemon.stats["hp"] <= 0 else self.opponent_pokemon.name
+                draw_text(self.screen, f"{winner.capitalize()} wins!", 300, 300)
+                pygame.display.flip()
+                pygame.time.wait(3000)
+                running = False
+
+    def player_attack(self):
+        move = self.player_pokemon.get_random_move()
+        damage = self.combat.apply_damage(self.player_pokemon, self.opponent_pokemon)
+        draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} used {move}!", 50, 450)
+        draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} took {damage} damage!", 50, 480)
+
+    def player_defend(self):
+        draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} is defending!", 50, 450)
+
+    def opponent_attack(self):
+        move = self.opponent_pokemon.get_random_move()
+        damage = self.combat.apply_damage(self.opponent_pokemon, self.player_pokemon)
+        draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} used {move}!", 50, 450)
+        draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} took {damage} damage!", 50, 480)
