@@ -51,10 +51,9 @@ class Game:
             player_x, player_y = 100, 300 + oscillation
             opponent_x, opponent_y = 550, 300 - oscillation
 
-            if self.player_pokemon.image:
-                self.screen.blit(self.player_pokemon.image, (player_x, player_y))
-            if self.opponent_pokemon.image:
-                self.screen.blit(self.opponent_pokemon.image, (opponent_x, opponent_y))
+            # Dessiner les Pokémon avec leurs effets visuels
+            self.player_pokemon.draw(self.screen, player_x, player_y)
+            self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
 
             if not self.game_over:
                 if self.turn == self.player_pokemon:
@@ -88,7 +87,7 @@ class Game:
 
     def player_attack(self):
         move = self.player_pokemon.get_random_move()
-        damage = self.combat.apply_damage(self.player_pokemon, self.opponent_pokemon)
+        damage = self.player_pokemon.attack(self.opponent_pokemon)  # Appel de la méthode attack
         draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} used {move}!", 50, 450)
         draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} took {damage} damage!", 50, 480)
 
@@ -97,6 +96,6 @@ class Game:
 
     def opponent_attack(self):
         move = self.opponent_pokemon.get_random_move()
-        damage = self.combat.apply_damage(self.opponent_pokemon, self.player_pokemon)
+        damage = self.opponent_pokemon.attack(self.player_pokemon)  # Appel de la méthode attack
         draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} used {move}!", 50, 450)
         draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} took {damage} damage!", 50, 480)

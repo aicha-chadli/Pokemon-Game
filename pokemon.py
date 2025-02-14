@@ -52,16 +52,15 @@ class Pokemon:
     def attack(self, target):
         """Attaque le Pokémon cible et déclenche l'effet visuel"""
         damage = random.randint(10, 30)  # Dégât aléatoire de l'attaque
-        target.hp -= damage
-        self.attack_effect = AttackEffect(self.name, self.types)
-        target.defense_effect = DefenseEffect(target.name, target.types)
+        target.stats["hp"] -= damage  # Mise à jour des points de vie de la cible
+        self.attack_effect = AttackEffect(self.name, self.types)  # Créer l'effet d'attaque
+        target.defense_effect = DefenseEffect(target.name, target.types)  # Créer l'effet de défense
         return damage
 
     def draw(self, screen, x, y):
         """Dessiner l'image du Pokémon"""
-        font = pygame.font.Font(None, 36)
-        text = font.render(self.name, True, (0, 0, 0))
-        screen.blit(text, (x, y))
+        if self.image:
+            screen.blit(self.image, (x, y))
         if self.attack_effect:
             self.attack_effect.draw(screen, x, y)
         if self.defense_effect:
