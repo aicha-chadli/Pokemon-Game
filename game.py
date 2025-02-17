@@ -45,6 +45,10 @@ class Game:
             draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 50, 50)
             draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 50, 100)
 
+            # Affichage des points de vie
+            draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} HP: {self.player_pokemon.stats['hp']}", 50, 150)
+            draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} HP: {self.opponent_pokemon.stats['hp']}", 50, 200)
+
             self.time += self.speed
             oscillation = math.sin(self.time) * self.amplitude
 
@@ -84,6 +88,7 @@ class Game:
                 pygame.display.flip()
                 pygame.time.wait(3000)
                 running = False
+
 
     def player_attack(self):
         move = self.player_pokemon.get_random_move()
