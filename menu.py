@@ -20,24 +20,37 @@ class MainMenu:
         self.button_load_image = pygame.image.load('button_load.png')
         self.button_quit_image = pygame.image.load('button_quit.png')
         self.button_pokeball_image = pygame.image.load('pokeball.png')
+        self.background_pokchoice = pygame.image.load('pokchoice_background.jpg')
+        self.background_pokchoice = pygame.transform.scale(self.background_pokchoice, (800, 600))
         
+        # Chargement des flèches pour le choix de Pokémon
+        self.arrow_left_image = pygame.image.load('arrow_left.png')
+        self.arrow_right_image = pygame.image.load('arrow_right.png')
 
-        # Taille originale des boutons
+        # Chargement du bouton choose_poke
+        self.choose_poke_image = pygame.image.load('choose_poke.png')
+
+        # Taille originale des boutons et flèches
         self.original_size = (70, 70)
         self.button_play_image = pygame.transform.scale(self.button_play_image, self.original_size)
         self.button_load_image = pygame.transform.scale(self.button_load_image, self.original_size)
         self.button_quit_image = pygame.transform.scale(self.button_quit_image, self.original_size)
         self.button_pokeball_image = pygame.transform.scale(self.button_pokeball_image, self.original_size)
+        self.arrow_left_image = pygame.transform.scale(self.arrow_left_image, (50, 50))
+        self.arrow_right_image = pygame.transform.scale(self.arrow_right_image, (50, 50))
+        self.choose_poke_image = pygame.transform.scale(self.choose_poke_image, (50, 50))
 
-        # Positions des boutons
+        # Positions des boutons du menu principal
         self.button_play_rect = self.button_play_image.get_rect(topleft=(230, 520))
         self.button_load_rect = self.button_load_image.get_rect(topleft=(370, 520))
         self.button_quit_rect = self.button_quit_image.get_rect(topleft=(500, 520))
         self.button_pokeball_rect = self.button_pokeball_image.get_rect(topleft=(20, 20))
 
         # Variables pour l'effet pulse
-        self.pulse_speed = 0.1  # Vitesse du pulsation
-        self.pulse_amplitude = 0.05  # Amplitude du pulsation
+        self.pulse_speed = 0.1  # Vitesse du pulsation pour le menu principal
+        self.pulse_speed1 = 0.025  # Vitesse du pulsation pour le fond de launch_game
+        self.pulse_amplitude = 0.05  # Amplitude du pulsation pour le menu principal
+        self.pulse_amplitude1 = 0.08  # Amplitude du pulsation pour le fond de launch_game
         self.frame = 0  # Compteur d'animation
 
     def run(self):
@@ -63,9 +76,9 @@ class MainMenu:
             pokeball_scaled = pygame.transform.scale(self.button_pokeball_image, 
                                                  (int(self.original_size[0] * scale_factor), 
                                                   int(self.original_size[1] * scale_factor)))
+            
 
-
-            # Recalcule les nouvelles positions pour centrer les boutons après mise à l'échelle
+            # Recalculer les positions pour centrer les boutons après mise à l'échelle
             play_rect = play_scaled.get_rect(center=self.button_play_rect.center)
             load_rect = load_scaled.get_rect(center=self.button_load_rect.center)
             quit_rect = quit_scaled.get_rect(center=self.button_quit_rect.center)
@@ -108,21 +121,46 @@ class MainMenu:
     def launch_game(self):
         running = True
         while running:
-            self.screen.fill((0, 0, 0))  
-            draw_text(self.screen, "<-- / --> to choose a Pokémon", 200, 100)
-            draw_text(self.screen, "C to validate", 200, 150)
-            draw_text(self.screen, self.selected_pokemon.name.capitalize(), 350, 200)
+            # Calculer le facteur de mise à l'échelle pour l'effet pulse sur le fond
+            scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
+            # Redimensionner l'image de fond en fonction du facteur de pulsation
+            scaled_bg = pygame.transform.scale(
+                self.background_pokchoice, 
+                (int(800 * scale_factor), int(600 * scale_factor))
+            )
+            # Centrer l'image redimensionnée (écran de 800x600, centre en (400,300))
+            bg_rect = scaled_bg.get_rect(center=(400, 300))
+            self.screen.blit(scaled_bg, bg_rect.topleft)
 
+            # Afficher le nom du Pokémon en haut (centré)
+            draw_text(self.screen, self.selected_pokemon.name.capitalize(), 350, 130)
+
+            # Afficher et agrandir l'image du Pokémon
             if self.selected_pokemon.image:
-                self.screen.blit(self.selected_pokemon.image, (350, 250))
+                scaled_image = pygame.transform.scale(self.selected_pokemon.image, (200, 200))
+                image_rect = scaled_image.get_rect(center=(400, 250))
+                self.screen.blit(scaled_image, image_rect.topleft)
+            else:
+                image_rect = pygame.Rect(400 - 100, 250 - 100, 200, 200)
 
-            y_offset = 400
+            # Positionner et afficher les flèches
+            arrow_left_rect = self.arrow_left_image.get_rect(center=(image_rect.left - 50, image_rect.centery))
+            self.screen.blit(self.arrow_left_image, arrow_left_rect.topleft)
+            arrow_right_rect = self.arrow_right_image.get_rect(center=(image_rect.right + 50, image_rect.centery))
+            self.screen.blit(self.arrow_right_image, arrow_right_rect.topleft)
+
+            # Afficher les stats du Pokémon sous l'image, décalées à gauche
+            y_offset = image_rect.bottom - 15
             for stat, value in self.selected_pokemon.stats.items():
-                draw_text(self.screen, f"{stat.capitalize()}: {value}", 350, y_offset)
-                y_offset += 30
+                draw_text(self.screen, f"{stat.capitalize()}: {value}", 330, y_offset)
+                y_offset += 20
+
+            # Ajouter le bouton choose_poke en dessous des stats
+            choose_poke_rect = self.choose_poke_image.get_rect(center=(400, y_offset + 40))
+            self.screen.blit(self.choose_poke_image, choose_poke_rect.topleft)
 
             pygame.display.flip()
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
@@ -137,8 +175,30 @@ class MainMenu:
                         game = Game(self.screen, self.selected_pokemon)
                         game.run()
                         running = False
-                    
+
                     # Mise à jour du Pokémon sélectionné
                     self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
                     self.attack_effect = None
                     self.defense_effect = None
+
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        # Vérifier clic sur flèche gauche
+                        if arrow_left_rect.collidepoint(event.pos):
+                            self.current_index = (self.current_index - 1) % len(self.pokemon_names)
+                            self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
+                        # Vérifier clic sur flèche droite
+                        elif arrow_right_rect.collidepoint(event.pos):
+                            self.current_index = (self.current_index + 1) % len(self.pokemon_names)
+                            self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
+                        # Vérifier clic sur le bouton choose_poke
+                        elif choose_poke_rect.collidepoint(event.pos):
+                            game = Game(self.screen, self.selected_pokemon)
+                            game.run()
+                            running = False
+
+                        self.attack_effect = None
+                        self.defense_effect = None
+
+            # Incrémenter le compteur pour l'effet de pulsation
+            self.frame += 1
