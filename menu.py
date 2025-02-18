@@ -109,6 +109,7 @@ class MainMenu:
                     self.attack_effect = None
                     self.defense_effect = None
 
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if self.button_play_rect.collidepoint(event.pos):
@@ -224,4 +225,3 @@ class MainMenu:
 
             # Incrémenter le compteur pour l'effet de pulsation
             self.frame += 1
-            
