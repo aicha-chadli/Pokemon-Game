@@ -16,12 +16,16 @@ class Game:
 
         # Agrandissement des sprites
         self.scale_factor = 2
-        self.player_pokemon.image = pygame.transform.scale(self.player_pokemon.image, 
-                                                          (self.player_pokemon.image.get_width() * self.scale_factor, 
-                                                           self.player_pokemon.image.get_height() * self.scale_factor))
-        self.opponent_pokemon.image = pygame.transform.scale(self.opponent_pokemon.image, 
-                                                             (self.opponent_pokemon.image.get_width() * self.scale_factor, 
-                                                              self.opponent_pokemon.image.get_height() * self.scale_factor))
+        self.player_pokemon.image = pygame.transform.scale(
+            self.player_pokemon.image, 
+            (self.player_pokemon.image.get_width() * self.scale_factor, 
+             self.player_pokemon.image.get_height() * self.scale_factor)
+        )
+        self.opponent_pokemon.image = pygame.transform.scale(
+            self.opponent_pokemon.image, 
+            (self.opponent_pokemon.image.get_width() * self.scale_factor, 
+             self.opponent_pokemon.image.get_height() * self.scale_factor)
+        )
 
         self.time = 0
         self.amplitude = 10
@@ -37,6 +41,9 @@ class Game:
             Attack("Pistolet à O", "water", 40, 25),
             Attack("Griffe", "normal", 50, 30)
         ]
+        
+        # Liste pour stocker les messages à afficher à l'écran
+        self.message_log = []
 
     def _get_random_pokemon(self, excluded_pokemon_name):
         pokemon_list = ["pikachu", "bulbasaur", "charmander", "squirtle", "jigglypuff", "eevee", "snorlax", "mewtwo"]
@@ -47,6 +54,18 @@ class Game:
         
         random_pokemon_name = random.choice(pokemon_list)
         return Pokemon(random_pokemon_name)
+
+    def add_message(self, message):
+        """Ajoute un message au log et conserve les 5 derniers messages."""
+        self.message_log.append(message)
+        if len(self.message_log) > 5:
+            self.message_log.pop(0)
+
+    def display_message_log(self):
+        """Affiche les messages du log dans une zone dédiée."""
+        start_y = 100  # Position verticale de départ
+        for i, message in enumerate(self.message_log):
+            draw_text(self.screen, message, 500, start_y + i * 30)
 
     def run(self):
         running = True
@@ -64,12 +83,16 @@ class Game:
             self.time += self.speed
             oscillation = math.sin(self.time) * self.amplitude
 
-            player_x, player_y = 100, 300 + oscillation
-            opponent_x, opponent_y = 550, 300 - oscillation
+            player_x, player_y = 100 + oscillation , 350 - oscillation
+            opponent_x, opponent_y = 550 - oscillation , 200 + oscillation
+
 
             # Dessiner les Pokémon avec leurs effets visuels
             self.player_pokemon.draw(self.screen, player_x, player_y)
             self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
+
+            # Affiche le log de messages à l'écran
+            self.display_message_log()
 
             if not self.game_over:
                 if self.turn == self.player_pokemon:
@@ -95,7 +118,8 @@ class Game:
             if self.player_pokemon.stats["hp"] <= 0 or self.opponent_pokemon.stats["hp"] <= 0:
                 self.game_over = True
                 winner = self.player_pokemon.name if self.opponent_pokemon.stats["hp"] <= 0 else self.opponent_pokemon.name
-                draw_text(self.screen, f"{winner.capitalize()} wins!", 300, 300)
+                self.add_message(f"{winner.capitalize()} wins!")
+                self.display_message_log()
                 pygame.display.flip()
                 pygame.time.wait(3000)
                 running = False
@@ -112,23 +136,27 @@ class Game:
             damage, effectiveness, critical, _ = self.combat.apply_damage(self.player_pokemon, self.opponent_pokemon, attack)
             attack.pp -= 1  # Réduction du PP
 
-            draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} used {attack.name}!", 50, 450)
+            self.add_message(f"{self.player_pokemon.name.capitalize()} used {attack.name}!")
             if critical:
-                draw_text(self.screen, "🔥 Critical hit!", 50, 480)
+                self.add_message("🔥 Critical hit!")
             if effectiveness > 1:
-                draw_text(self.screen, "It's super effective!", 50, 510)
+                self.add_message("It's super effective!")
             elif effectiveness < 1:
-                draw_text(self.screen, "It's not very effective...", 50, 510)
+                self.add_message("It's not very effective...")
+            self.add_message(f"{self.player_pokemon.name.capitalize()} dealt {damage} damage!")
+        else:
+            self.add_message(f"{attack.name} n'a plus de PP!")
 
     def opponent_attack(self):
-        """ L'IA choisit une attaque aléatoire """
+        """ L'IA choisit une attaque aléatoire et affiche le feedback sur la fenêtre """
         move = random.choice(self.player_moves)
         damage, effectiveness, critical, _ = self.combat.apply_damage(self.opponent_pokemon, self.player_pokemon, move)
 
-        draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} used {move.name}!", 50, 450)
+        self.add_message(f"{self.opponent_pokemon.name.capitalize()} used {move.name}!")
         if critical:
-            draw_text(self.screen, "🔥 Critical hit!", 50, 480)
+            self.add_message("🔥 Critical hit!")
         if effectiveness > 1:
-            draw_text(self.screen, "It's super effective!", 50, 510)
+            self.add_message("It's super effective!")
         elif effectiveness < 1:
-            draw_text(self.screen, "It's not very effective...", 50, 510)
+            self.add_message("It's not very effective...")
+        self.add_message(f"{self.opponent_pokemon.name.capitalize()} dealt {damage} damage!")
