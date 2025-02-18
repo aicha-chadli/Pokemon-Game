@@ -5,23 +5,25 @@ from pokemon import Pokemon
 from utils import draw_text
 from combat import Combat
 from combat import Attack
+from save_manager import SaveManager
 
 class Game:
-    def __init__(self, screen, player_pokemon):
+    def __init__(self, screen, player_pokemon, opponent_pokemon=None):
         self.screen = screen
         self.player_pokemon = player_pokemon
-        self.opponent_pokemon = self._get_random_pokemon(player_pokemon.name)
+        # Si se proporciona un oponente específico, usarlo, sino elegir uno aleatorio
+        self.opponent_pokemon = opponent_pokemon if opponent_pokemon else self._get_random_pokemon(player_pokemon.name)
         self.background = pygame.image.load("battle_pokemon.jpg")
         self.background = pygame.transform.scale(self.background, (800, 600))
 
         # Agrandissement des sprites
         self.scale_factor = 2
         self.player_pokemon.image = pygame.transform.scale(self.player_pokemon.image, 
-                                                          (self.player_pokemon.image.get_width() * self.scale_factor, 
-                                                           self.player_pokemon.image.get_height() * self.scale_factor))
+                                                      (self.player_pokemon.image.get_width() * self.scale_factor, 
+                                                       self.player_pokemon.image.get_height() * self.scale_factor))
         self.opponent_pokemon.image = pygame.transform.scale(self.opponent_pokemon.image, 
-                                                             (self.opponent_pokemon.image.get_width() * self.scale_factor, 
-                                                              self.opponent_pokemon.image.get_height() * self.scale_factor))
+                                                         (self.opponent_pokemon.image.get_width() * self.scale_factor, 
+                                                          self.opponent_pokemon.image.get_height() * self.scale_factor))
 
         self.time = 0
         self.amplitude = 10
@@ -37,6 +39,9 @@ class Game:
             Attack("Pistolet à O", "water", 40, 25),
             Attack("Griffe", "normal", 50, 30)
         ]
+
+        # Guardar la batalla actual
+        SaveManager.save_battle(self.player_pokemon, self.opponent_pokemon)
 
     def _get_random_pokemon(self, excluded_pokemon_name):
         pokemon_list = ["pikachu", "bulbasaur", "charmander", "squirtle", "jigglypuff", "eevee", "snorlax", "mewtwo"]
@@ -132,3 +137,4 @@ class Game:
             draw_text(self.screen, "It's super effective!", 50, 510)
         elif effectiveness < 1:
             draw_text(self.screen, "It's not very effective...", 50, 510)
+            

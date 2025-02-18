@@ -3,6 +3,7 @@ import math
 from pokemon import Pokemon
 from utils import draw_text
 from game import Game
+from save_manager import SaveManager
 
 class MainMenu:
     def __init__(self, screen):
@@ -26,7 +27,7 @@ class MainMenu:
         # Chargement des flèches pour le choix de Pokémon
         self.arrow_left_image = pygame.image.load('arrow_left.png')
         self.arrow_right_image = pygame.image.load('arrow_right.png')
-
+        
         # Chargement du bouton choose_poke
         self.choose_poke_image = pygame.image.load('choose_poke.png')
 
@@ -65,17 +66,17 @@ class MainMenu:
 
             # Appliquer l'effet pulse sur chaque bouton
             play_scaled = pygame.transform.scale(self.button_play_image, 
-                                                 (int(self.original_size[0] * scale_factor), 
-                                                  int(self.original_size[1] * scale_factor)))
+                                             (int(self.original_size[0] * scale_factor), 
+                                              int(self.original_size[1] * scale_factor)))
             load_scaled = pygame.transform.scale(self.button_load_image, 
-                                                 (int(self.original_size[0] * scale_factor), 
-                                                  int(self.original_size[1] * scale_factor)))
+                                             (int(self.original_size[0] * scale_factor), 
+                                              int(self.original_size[1] * scale_factor)))
             quit_scaled = pygame.transform.scale(self.button_quit_image, 
-                                                 (int(self.original_size[0] * scale_factor), 
-                                                  int(self.original_size[1] * scale_factor)))
+                                             (int(self.original_size[0] * scale_factor), 
+                                              int(self.original_size[1] * scale_factor)))
             pokeball_scaled = pygame.transform.scale(self.button_pokeball_image, 
-                                                 (int(self.original_size[0] * scale_factor), 
-                                                  int(self.original_size[1] * scale_factor)))
+                                             (int(self.original_size[0] * scale_factor), 
+                                              int(self.original_size[1] * scale_factor)))
             
 
             # Recalculer les positions pour centrer les boutons après mise à l'échelle
@@ -112,11 +113,32 @@ class MainMenu:
                     if event.button == 1:
                         if self.button_play_rect.collidepoint(event.pos):
                             self.launch_game()
+                        elif self.button_load_rect.collidepoint(event.pos):
+                            self.load_last_battle()
                         elif self.button_quit_rect.collidepoint(event.pos):
                             running = False
 
+                        self.attack_effect = None
+                        self.defense_effect = None
+
             self.frame += 1  # Incrémentation du compteur d'animation
             clock.tick(60)  # Limite à 60 FPS
+
+    def load_last_battle(self):
+        #Carga y reinicia la última batalla guardada
+        player_name, opponent_name = SaveManager.load_last_battle()
+        if player_name and opponent_name:
+            # Crear objetos Pokemon para el jugador y el oponente
+            player_pokemon = Pokemon(player_name)
+            opponent_pokemon = Pokemon(opponent_name)
+            # Iniciar el juego con el oponente guardado
+            game = Game(self.screen, player_pokemon, opponent_pokemon)
+            game.run()
+        else:
+            # Si no hay batalla guardada, mostrar mensaje
+            draw_text(self.screen, "No hay batallas guardadas", 300, 300)
+            pygame.display.flip()
+            pygame.time.wait(2000)
 
     def launch_game(self):
         running = True
@@ -202,3 +224,4 @@ class MainMenu:
 
             # Incrémenter le compteur pour l'effet de pulsation
             self.frame += 1
+            
