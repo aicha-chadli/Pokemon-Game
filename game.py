@@ -5,6 +5,7 @@ from pokemon import Pokemon
 from utils import draw_text
 from combat import Combat
 from combat import Attack
+from save_manager import SaveManager
 
 class Game:
     def __init__(self, screen, player_pokemon):
@@ -41,6 +42,9 @@ class Game:
             Attack("Pistolet à O", "water", 40, 25),
             Attack("Griffe", "normal", 50, 30)
         ]
+
+        # Guardar la batalla actual
+        SaveManager.save_battle(self.player_pokemon, self.opponent_pokemon)
         
         # Liste pour stocker les messages à afficher à l'écran
         self.message_log = []

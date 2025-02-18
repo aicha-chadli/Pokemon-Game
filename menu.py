@@ -3,6 +3,7 @@ import math
 from pokemon import Pokemon
 from utils import draw_text
 from game import Game
+from save_manager import SaveManager 
 
 class MainMenu:
     def __init__(self, screen):
@@ -108,15 +109,37 @@ class MainMenu:
                     self.attack_effect = None
                     self.defense_effect = None
 
+
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        if self.button_play_rect.collidepoint(event.pos):
-                            self.launch_game()
+                        if event.button == 1:
+                            if self.button_play_rect.collidepoint(event.pos):
+                               self.launch_game()
+                        elif self.button_load_rect.collidepoint(event.pos):
+                            self.load_last_battle()
                         elif self.button_quit_rect.collidepoint(event.pos):
                             running = False
 
+                        self.attack_effect = None
+                        self.defense_effect = None
+
             self.frame += 1  # Incrémentation du compteur d'animation
             clock.tick(60)  # Limite à 60 FPS
+
+    def load_last_battle(self):
+        #Carga y reinicia la última batalla guardada
+        player_name, opponent_name = SaveManager.load_last_battle()
+        if player_name and opponent_name:
+            # Crear objetos Pokemon para el jugador y el oponente
+            player_pokemon = Pokemon(player_name)
+            opponent_pokemon = Pokemon(opponent_name)
+            # Iniciar el juego con el oponente guardado
+            game = Game(self.screen, player_pokemon, opponent_pokemon)
+            game.run()
+        else:
+            # Si no hay batalla guardada, mostrar mensaje
+            draw_text(self.screen, "No hay batallas guardadas", 300, 300)
+            pygame.display.flip()
+            pygame.time.wait(2000)
 
     def launch_game(self):
         running = True
