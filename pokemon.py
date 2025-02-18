@@ -8,11 +8,12 @@ import math
 pygame.init()
 
 class Pokemon:
-    def __init__(self, name):
+    def __init__(self, name, level=1):
         self.name = name.lower()
+        self.level = level  # Added level attribute with a default value of 1
         self.data = self._fetch_pokemon_data()
         self.types = self.data.get("types", [])
-        self.stats = self.data.get("stats", {"hp": 100})  # Ajout d'un hp par défaut si non présent
+        self.stats = self.data.get("stats", {"hp": 100})  # Default HP if not present
         self.image = self._load_image()
         self.moves = self._fetch_pokemon_moves()
         
@@ -36,9 +37,10 @@ class Pokemon:
         response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{self.name}")
         if response.status_code == 200:
             data = response.json()
-            moves = [move["move"]["name"] for move in data["moves"]]
+            moves = [move["move"]["name"] for move in data.get("moves", [])]
             return moves
         return []
+
 
     def _load_image(self):
         if "id" in self.data:
