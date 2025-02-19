@@ -18,9 +18,9 @@ Pokémon Battle est un mini-jeu de combat au tour par tour inspiré des jeux Pok
 🛠️ Technologies utilisées
 
 - Python 3.10+
-- 
+  
 - Pygame (affichage et interactions)
-- 
+  
 - Requests (récupération des données de PokeAPI)
-- 
+  
 - PokeAPI (données des Pokémon)
