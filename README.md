@@ -24,3 +24,21 @@ Pokémon Battle est un mini-jeu de combat au tour par tour inspiré des jeux Pok
 - Requests (récupération des données de PokeAPI)
   
 - PokeAPI (données des Pokémon)
+
+🔧 Installation et exécution
+
+1️⃣ Prérequis
+Assurez-vous d'avoir Python 3.10+ installé sur votre machine.
+
+2️⃣ Cloner le projet
+
+git clone https://github.com/votre-repo/pokemon-battle.git
+cd pokemon-battle
+
+3️⃣ Installer les dépendances
+
+pip install -r requirements.txt
+
+4️⃣ Lancer le jeu
+
+python main.py
