@@ -1,6 +1,6 @@
 import pygame
 
-def draw_text(screen, text, x, y, font_size=30, color=(255,255,255)):
+def draw_text(screen, text, x, y, font_size=25, color=(255,255,255)):
     """
     Dibuja texto en la pantalla con el color especificado
     :param screen: superficie de pygame donde dibujar

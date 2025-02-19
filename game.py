@@ -66,22 +66,22 @@ class Game:
 
     def display_message_log(self):
         """Muestra los mensajes del log"""
-        y_start = 100
+        y_start = 40
         total_messages = len(self.message_log)
         
         for i, message in enumerate(self.message_log):
             # Determinar el color basado en el contenido del mensaje
             if self.player_pokemon.name.lower() in message.lower():
-                color = (0, 255, 0)  # Verde para mensajes del jugador
+                color = (90, 223, 42)  # Verde para mensajes del jugador
             elif self.opponent_pokemon.name.lower() in message.lower():
-                color = (255, 0, 0)  # Rojo para mensajes del oponente
+                color = (254, 59, 74)  # Rojo para mensajes del oponente
             else:
                 # Para mensajes genéricos como "Critical hit!" o "It's super effective!"
                 # Usar el color del último pokémon que atacó
                 last_attacker = self.player_pokemon.name if self.turn == self.opponent_pokemon else self.opponent_pokemon.name
                 color = (0, 255, 0) if last_attacker == self.player_pokemon.name else (255, 0, 0)
 
-            draw_text(self.screen, message, 500, y_start + (i * 30), color=color)
+            draw_text(self.screen, message, 42, y_start + (i * 30), color=color)
 
     def run(self):
         running = True
@@ -89,22 +89,24 @@ class Game:
 
         while running:
             self.screen.blit(self.background, (0, 0))
-            draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 50, 50)
-            draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 50, 100)
-
-            # Affichage des points de vie
-            draw_text(self.screen, f"{self.player_pokemon.name.capitalize()} HP: {self.player_pokemon.stats['hp']}", 50, 150)
-            draw_text(self.screen, f"{self.opponent_pokemon.name.capitalize()} HP: {self.opponent_pokemon.stats['hp']}", 50, 200)
 
             self.time += self.speed
             oscillation = math.sin(self.time) * self.amplitude
 
-            player_x, player_y = 100 + oscillation, 350 - oscillation
-            opponent_x, opponent_y = 550 - oscillation, 200 + oscillation
+            player_x, player_y = 60 + oscillation, 340 - oscillation
+            opponent_x, opponent_y = 535 - oscillation, 100 + oscillation
 
             # Dessiner les Pokémon avec leurs effets visuels
             self.player_pokemon.draw(self.screen, player_x, player_y)
             self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
+
+            draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 60, 540)
+            draw_text(self.screen, f"HP: {self.player_pokemon.stats['hp']}", 85, 565)     # Affichage des points de vie
+
+            draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 565, 300)
+            draw_text(self.screen, f"HP: {self.opponent_pokemon.stats['hp']}", 590, 325)    # Affichage des points de vie
+
+
 
             if not self.game_over:
                 if self.turn == self.player_pokemon:
@@ -152,7 +154,7 @@ class Game:
         """ Affichage des attaques disponibles avec leurs PP restants """
         for i, move in enumerate(self.player_moves):
             move_text = f"{i + 1}. {move.name} ({move.pp} PP)"
-            draw_text(self.screen, move_text, 50, 450 + (i * 30))
+            draw_text(self.screen, move_text, 345, 460 + (i * 25), 25, (20,20,20))
 
     def player_attack(self, attack):
         """ Exécute une attaque du joueur """
