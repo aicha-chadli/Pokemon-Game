@@ -20,6 +20,9 @@ class Pokemon:
         # Attributs pour les effets visuels
         self.attack_effect = None
         self.defense_effect = None
+        self.damage_text = None
+        self.damage_timer = 0
+        self.damage_pos = None
 
     def _fetch_pokemon_data(self):
         response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{self.name}")
@@ -76,6 +79,25 @@ class Pokemon:
 
         if self.image:
             screen.blit(self.image, (draw_x, draw_y))
+
+        # Mostrar el texto de daño si existe
+        if self.damage_text and self.damage_timer > 0:
+            font = pygame.font.Font(None, 36)
+            text = font.render(f"-{self.damage_text}", True, (255, 0, 0))  # Texto rojo
+            # Posición del texto: encima de la cabeza del pokémon
+            if not self.damage_pos:
+                self.damage_pos = [draw_x + self.image.get_width() // 2, draw_y - 20]
+            # Hacer que el texto suba y se desvanezca
+            self.damage_pos[1] -= 1  # Mover hacia arriba
+            alpha = int(255 * (self.damage_timer / 60))  # Desvanecer gradualmente
+            text.set_alpha(alpha)
+            text_rect = text.get_rect(center=(self.damage_pos[0], self.damage_pos[1]))
+            screen.blit(text, text_rect)
+            self.damage_timer -= 1
+            if self.damage_timer <= 0:
+                self.damage_text = None
+                self.damage_pos = None
+
         # Dessiner les effets d'attaque et de défense par-dessus
         if self.attack_effect:
             self.attack_effect.draw(screen, draw_x, draw_y)

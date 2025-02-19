@@ -120,7 +120,17 @@ class Game:
             if self.player_pokemon.stats["hp"] <= 0 or self.opponent_pokemon.stats["hp"] <= 0:
                 self.game_over = True
                 winner = self.player_pokemon.name if self.opponent_pokemon.stats["hp"] <= 0 else self.opponent_pokemon.name
-                self.add_message(f"{winner.capitalize()} wins!")
+                # Crear una superficie semitransparente para el fondo del mensaje
+                overlay = pygame.Surface((800, 600))
+                overlay.set_alpha(128)
+                overlay.fill((0, 0, 0))
+                self.screen.blit(overlay, (0, 0))
+
+                # Mostrar mensaje del ganador en grande y centrado
+                font = pygame.font.Font(None, 74)  # Fuente más grande
+                text = font.render(f"{winner.capitalize()} WINS!", True, (255, 215, 0))  # Color dorado
+                text_rect = text.get_rect(center=(400, 300))  # Centrado en la pantalla
+                self.screen.blit(text, text_rect)
                 pygame.display.flip()
                 pygame.time.wait(3000)
                 running = False
