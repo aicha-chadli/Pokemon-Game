@@ -109,7 +109,7 @@ class Combat:
 
             # Mostrar el daño recibido
             defender.damage_text = str(damage)
-            defender.damage_timer = 60  # Duración en frames (1 segundo a 60 FPS)
+            defender.damage_timer = 50  # Duración en frames (1 segundo a 60 FPS)
 
             # Appliquer un modificateur de stat si l'attaque en a un
             stat_change = None

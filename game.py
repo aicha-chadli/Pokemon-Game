@@ -67,8 +67,21 @@ class Game:
     def display_message_log(self):
         """Muestra los mensajes del log"""
         y_start = 100
+        total_messages = len(self.message_log)
+        
         for i, message in enumerate(self.message_log):
-            draw_text(self.screen, message, 500, y_start + (i * 30))
+            # Determinar el color basado en el contenido del mensaje
+            if self.player_pokemon.name.lower() in message.lower():
+                color = (0, 255, 0)  # Verde para mensajes del jugador
+            elif self.opponent_pokemon.name.lower() in message.lower():
+                color = (255, 0, 0)  # Rojo para mensajes del oponente
+            else:
+                # Para mensajes genéricos como "Critical hit!" o "It's super effective!"
+                # Usar el color del último pokémon que atacó
+                last_attacker = self.player_pokemon.name if self.turn == self.opponent_pokemon else self.opponent_pokemon.name
+                color = (0, 255, 0) if last_attacker == self.player_pokemon.name else (255, 0, 0)
+
+            draw_text(self.screen, message, 500, y_start + (i * 30), color=color)
 
     def run(self):
         running = True
@@ -150,7 +163,7 @@ class Game:
             # Añadir mensajes al log
             self.add_message(f"{self.player_pokemon.name.capitalize()} used {attack.name}!")
             if critical:
-                self.add_message("🔥 Critical hit!")
+                self.add_message("--> Critical hit!")
             if effectiveness > 1:
                 self.add_message("It's super effective!")
             elif effectiveness < 1:
@@ -164,7 +177,7 @@ class Game:
         # Añadir mensajes al log
         self.add_message(f"{self.opponent_pokemon.name.capitalize()} used {move.name}!")
         if critical:
-            self.add_message("🔥 Critical hit!")
+            self.add_message("--> Critical hit!")
         if effectiveness > 1:
             self.add_message("It's super effective!")
         elif effectiveness < 1:
