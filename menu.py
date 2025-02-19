@@ -97,9 +97,11 @@ class MainMenu:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
+                    if event.key == pygame.K_p:
                         self.launch_game()
-                    elif event.key == pygame.K_2 or event.key == pygame.K_ESCAPE:
+                    elif event.key == pygame.K_l:
+                        self.load_last_battle()
+                    elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
                         running = False
                     elif event.key == pygame.K_LEFT:
                         self.current_index = (self.current_index - 1) % len(self.pokemon_names)
@@ -108,7 +110,6 @@ class MainMenu:
                     self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
                     self.attack_effect = None
                     self.defense_effect = None
-
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
