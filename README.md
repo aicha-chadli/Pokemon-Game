@@ -43,3 +43,23 @@ pip install -r requirements.txt
 4️⃣ Lancer le jeu
 
 python main.py
+
+📌 Exemple d'utilisation
+
+- Le jeu sélectionne deux Pokémon aléatoirement (ex : Pikachu vs Salamèche).
+
+- Chaque Pokémon attaque à tour de rôle.
+
+- Les dégâts sont calculés en fonction des statistiques des Pokémon.
+  
+- Le combat continue jusqu'à ce qu'un Pokémon atteigne 0 PV.
+
+- Une annonce affiche le gagnant.
+
+  📝 Auteur
+  
+👤 Clarisse Oyharcabal 
+👤 Aicha Chadli
+👤 Andres Montes Zuluaga
+
+📌 Projet réalisé dans un cadre éducatif et pour l’apprentissage de Python et Pygame.
