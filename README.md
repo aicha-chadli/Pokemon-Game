@@ -33,6 +33,7 @@ Assurez-vous d'avoir Python 3.10+ installé sur votre machine.
 2️⃣ Cloner le projet
 
 git clone https://github.com/votre-repo/pokemon-battle.git
+
 cd pokemon-battle
 
 3️⃣ Installer les dépendances
