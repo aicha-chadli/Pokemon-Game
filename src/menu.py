@@ -1,11 +1,11 @@
 import pygame
 import math
-from pokemon import Pokemon
-from utils import draw_text
-from game import Game
-from save_manager import SaveManager
-from pokedex import Pokedex
-from sound_manager import SoundManager
+from .pokemon import Pokemon
+from .utils import draw_text
+from .game import Game
+from .save_manager import SaveManager
+from .pokedex import Pokedex
+from .sound_manager import SoundManager
 
 class MainMenu:
     def __init__(self, screen):
@@ -16,26 +16,26 @@ class MainMenu:
         # Inicializar el gestor de sonido
         self.sound_manager = SoundManager()
         
-        self.background_main_menu = pygame.image.load('background_pokemon.jpg')
+        self.background_main_menu = pygame.image.load('assets/images/background_pokemon.jpg')
         self.background_main_menu = pygame.transform.scale(self.background_main_menu, (800, 600))
         self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
         self.attack_effect = None
         self.defense_effect = None
 
         # Chargement des boutons
-        self.button_play_image = pygame.image.load('button_play.png')
-        self.button_load_image = pygame.image.load('button_load.png')
-        self.button_quit_image = pygame.image.load('button_quit.png')
-        self.button_pokeball_image = pygame.image.load('pokeball.png')
-        self.background_pokchoice = pygame.image.load('pokchoice_background.jpg')
+        self.button_play_image = pygame.image.load('assets/images/button_play.png')
+        self.button_load_image = pygame.image.load('assets/images/button_load.png')
+        self.button_quit_image = pygame.image.load('assets/images/button_quit.png')
+        self.button_pokeball_image = pygame.image.load('assets/images/pokeball.png')
+        self.background_pokchoice = pygame.image.load('assets/images/pokchoice_background.jpg')
         self.background_pokchoice = pygame.transform.scale(self.background_pokchoice, (800, 600))
         
         # Chargement des flèches pour le choix de Pokémon
-        self.arrow_left_image = pygame.image.load('arrow_left.png')
-        self.arrow_right_image = pygame.image.load('arrow_right.png')
+        self.arrow_left_image = pygame.image.load('assets/images/arrow_left.png')
+        self.arrow_right_image = pygame.image.load('assets/images/arrow_right.png')
         
         # Chargement du bouton choose_poke
-        self.choose_poke_image = pygame.image.load('choose_poke.png')
+        self.choose_poke_image = pygame.image.load('assets/images/choose_poke.png')
 
         # Taille originale des boutons et flèches
         self.original_size = (70, 70)
@@ -248,8 +248,8 @@ class MainMenu:
         # Recharger directement le Pokédex pour s'assurer que les données sont à jour
         pokedex.pokedex = pokedex._load_pokedex()  # Cette ligne recharge les données à chaque fois
         # Précharger les images et les redimensionner une seule fois
-        background = pygame.transform.scale(pygame.image.load('yellow_background.jpg'), (800, 600))  # Taille fixe pour optimisation
-        history_image = pygame.transform.scale(pygame.image.load('History_pokedex1.png'), (400, 500))
+        background = pygame.transform.scale(pygame.image.load('assets/images/yellow_background.jpg'), (800, 600))  # Taille fixe pour optimisation
+        history_image = pygame.transform.scale(pygame.image.load('assets/images/History_pokedex1.png'), (400, 500))
 
         # Police pour le nom du Pokémon (plus grande)
         name_font = pygame.font.Font(None, 35)  # Taille plus grande

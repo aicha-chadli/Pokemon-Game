@@ -2,11 +2,13 @@ import pygame
 import random
 import math
 import requests
-from pokemon import Pokemon
-from utils import draw_text
-from combat import Combat
-from combat import Attack
-from save_manager import SaveManager
+from .pokemon import Pokemon
+from .utils import draw_text
+from .combat import Combat
+from .combat import Attack
+from .save_manager import SaveManager
+from .pokedex import Pokedex
+from pygame.locals import *
 
 class Game:
     def __init__(self, screen, player_pokemon, opponent_pokemon=None):
@@ -14,7 +16,7 @@ class Game:
         self.player_pokemon = player_pokemon
         # Si se proporciona un oponente específico, usarlo, sino elegir uno aleatorio
         self.opponent_pokemon = opponent_pokemon if opponent_pokemon else self.get_random_pokemon(player_pokemon.name)
-        self.background = pygame.image.load("battle_pokemon.jpg")
+        self.background = pygame.image.load("assets/images/battle_pokemon.jpg")
         self.sound_manager = None  # Será establecido por el menú principal
         self.background = pygame.transform.scale(self.background, (800, 600))
 
@@ -188,7 +190,7 @@ class Game:
 
                 # Si le joueur gagne, ajouter le Pokémon vaincu au Pokédex
                 if winner == self.player_pokemon.name:
-                    from pokedex import Pokedex  # Import du Pokédex
+                    from .pokedex import Pokedex  # Import du Pokédex
                     pokedex = Pokedex()  # Création d'une instance du Pokédex
                     pokedex.add_pokemon(self.opponent_pokemon.name)  # Ajout du Pokémon vaincu
                     pokedex.save_pokedex()  # Recharger le Pokédex après l'ajout pour refléter les changements
@@ -199,7 +201,7 @@ class Game:
                 overlay.fill((0, 0, 0))
                 self.screen.blit(overlay, (0, 0))
 
-                font = pygame.font.Font('Consolab.ttf', 64)
+                font = pygame.font.Font('assets/fonts/Consolab.ttf', 64)
                 text = font.render(f"{winner.capitalize()} WINS!", True, (255, 215, 0))
                 text_rect = text.get_rect(center=(400, 300))
                 self.screen.blit(text, text_rect)

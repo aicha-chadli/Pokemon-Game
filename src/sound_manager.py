@@ -12,7 +12,7 @@ class SoundManager:
         self.current_music = None
         
         # Definir la ruta base para los archivos de música
-        self.sound_dir = os.path.join(os.path.dirname(__file__), "assets", "sounds")
+        self.sound_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "sounds")
         
         # Rutas de los archivos de música
         self.music_files = {

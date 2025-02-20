@@ -1,126 +1,149 @@
 import json
 import os
-from pokemon import Pokemon
+import requests
+import random
+from .pokemon import Pokemon
+from .effects import Effect
 
-# Check if the files exist before trying to open them
-pokemon_json_path = os.path.abspath("data\pokemon.json")
-pokedex_json_path = os.path.abspath("data\pokedex.json")
+TYPE_CHART_PATH = "type_chart.json"
 
-if not os.path.exists(pokemon_json_path):
-    raise FileNotFoundError(f"No such file or directory: '{pokemon_json_path}'")
-if not os.path.exists(pokedex_json_path):
-    raise FileNotFoundError(f"No such file or directory: '{pokedex_json_path}'")
+# Fonction pour récupérer le tableau des types
+def fetch_type_chart():
+    type_chart = {}
+    type_list = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground",
+                 "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"]
 
-with open(pokemon_json_path, "r") as file:
-    pokemon_json = json.load(file)
+    for type_name in type_list:
+        url = f"https://pokeapi.co/api/v2/type/{type_name}"
+        response = requests.get(url)
 
-# Handle the case where pokedex.json is empty or does not contain valid JSON
-try:
-    with open(pokedex_json_path, "r") as file:
-        pokedex_json = json.load(file)
-except json.JSONDecodeError:
-    pokedex_json = {}
+        if response.status_code == 200:
+            data = response.json()
+            damage_relations = data["damage_relations"]
 
-class Combat():
+            type_chart[type_name] = {
+                "double_damage_to": [t["name"] for t in damage_relations["double_damage_to"]],
+                "half_damage_to": [t["name"] for t in damage_relations["half_damage_to"]],
+                "no_damage_to": [t["name"] for t in damage_relations["no_damage_to"]]
+            }
+
+    with open(TYPE_CHART_PATH, "w") as file:
+        json.dump(type_chart, file, indent=4)
+
+    return type_chart
+
+if os.path.exists(TYPE_CHART_PATH):
+    with open(TYPE_CHART_PATH, "r") as file:
+        type_chart = json.load(file)
+else:
+    type_chart = fetch_type_chart()
+
+# 🎯 Gestion des attaques
+class Attack:
+    def __init__(self, name, attack_type, power, pp, stat_modifier=None):
+        self.name = name
+        self.attack_type = attack_type
+        self.power = power
+        self.pp = pp  # Nombre de fois que l'attaque peut être utilisée
+        self.stat_modifier = stat_modifier  # Peut modifier l'attaque ou la défense
+
+    def use(self):
+        if self.pp > 0:
+            self.pp -= 1
+            return True
+        return False
+
+# 📈 Gestion des changements de stats
+class StatModifier:
+    def __init__(self, target_stat, amount):
+        self.target_stat = target_stat
+        self.amount = amount  # Peut être positif (boost) ou négatif (malus)
+
+    def apply(self, pokemon):
+        pokemon.stats[self.target_stat] += self.amount
+        return self.amount
+
+# ⚔️ Classe Combat avec coups critiques et changements de stats
+class Combat:
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
+        self.current_effects = []  # Lista para mantener los efectos activos
+        # Inicializar posiciones por defecto
+        self.player.position = [60, 340]
+        self.enemy.position = [535, 100]
 
-    def damage_effectiveness(self, attacker, defender):
-        attacker_type = attacker.types[0]
-        defender_type = defender.types[0]
-        type_effectiveness = {
-            "normal": {"Normal": 1, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 1, "poison": 1, "ground": 1, "flying": 1, "psychic": 1, "bug": 1, "rock": 0.5, "ghost": 0, "dragon": 1, "dark": 1, "steel": 0.5, "fairy": 1},
-            "steel": {"Normal": 1, "fire": 0.5, "water": 0.5, "electric": 1, "grass": 2, "ice": 2, "fighting": 1, "poison": 1, "ground": 1, "flying": 1, "psychic": 1, "bug": 2, "rock": 0.5, "ghost": 1, "dragon": 0.5, "dark": 1, "steel": 2, "fairy": 1},
-            "water": {"Normal": 1, "fire": 2, "water": 0.5, "electric": 1, "grass": 0.5, "ice": 1, "fighting": 1, "poison": 1, "ground": 2, "flying": 1, "psychic": 1, "bug": 1, "rock": 2, "ghost": 1, "dragon": 0.5, "dark": 1, "steel": 1, "fairy": 1},
-            "electric": {"Normal": 1, "fire": 1, "water": 2, "electric": 0.5, "grass": 0.5, "ice": 1, "fighting": 1, "poison": 1, "ground": 0, "flying": 2, "psychic": 1, "bug": 1, "rock": 1, "ghost": 1, "dragon": 0.5, "dark": 1, "steel": 1, "fairy": 1},
-            "grass": {"Normal": 1, "fire": 0.5, "water": 2, "electric": 1, "grass": 0.5, "ice": 1, "fighting": 1, "poison": 0.5, "ground": 2, "flying": 0.5, "psychic": 1, "bug": 0.5, "rock": 2, "ghost": 1, "dragon": 0.5, "dark": 1, "steel": 0.5, "fairy": 1},
-            "ice": {"Normal": 1, "fire": 0.5, "water": 0.5, "electric": 1, "grass": 2, "ice": 0.5, "fighting": 1, "poison": 1, "ground": 2, "flying": 2, "psychic": 1, "bug": 1, "rock": 1, "ghost": 1, "dragon": 2, "dark": 1, "steel": 0.5, "fairy": 1},
-            "fighting": {"Normal": 2, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 2, "fighting": 1, "poison": 0.5, "ground": 1, "flying": 0.5, "psychic": 0.5, "bug": 0.5, "rock": 2, "ghost": 0, "dragon": 1, "dark": 2, "steel": 2, "fairy": 0.5},
-            "poison": {"Normal": 1, "fire": 1, "water": 1, "electric": 1, "grass": 2, "ice": 1, "fighting": 1, "poison": 0.5, "ground": 0.5, "flying": 1, "psychic": 1, "bug": 1, "rock": 0.5, "ghost": 0.5, "dragon": 1, "dark": 1, "steel": 0, "fairy": 2},
-            "ground": {"Normal": 1, "fire": 2, "water": 1, "electric": 2, "grass": 0.5, "ice": 1, "fighting": 1, "poison": 2, "ground": 1, "flying": 0, "psychic": 1, "bug": 0.5, "rock": 2, "ghost": 1, "dragon": 1, "dark": 1, "steel": 2, "fairy": 1},
-            "flying": {"Normal": 1, "fire": 1, "water": 1, "electric": 0.5, "grass": 2, "ice": 1, "fighting": 2, "poison": 1, "ground": 1, "flying": 1, "psychic": 1, "bug": 2, "rock": 0.5, "ghost": 1, "dragon": 1, "dark": 1, "steel": 0.5, "fairy": 1},
-            "psychic": {"Normal": 1, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 2, "poison": 2, "ground": 1, "flying": 1, "psychic": 0.5, "bug": 1, "rock": 1, "ghost": 1, "dragon": 1, "dark": 0, "steel": 0.5, "fairy": 1},
-            "bug": {"Normal": 1, "fire": 0.5, "water": 1, "electric": 1, "grass": 2, "ice": 1, "fighting": 0.5, "poison": 0.5, "ground": 1, "flying": 0.5, "psychic": 2, "bug": 1, "rock": 1, "ghost": 0.5, "dragon": 1, "dark": 2, "steel": 0.5, "fairy": 0.5},
-            "rock": {"Normal": 1, "fire": 2, "water": 1, "electric": 1, "grass": 1, "ice": 2, "fighting": 0.5, "poison": 1, "ground": 0.5, "flying": 2, "psychic": 1, "bug": 2, "rock": 1, "ghost": 1, "dragon": 1, "dark": 1, "steel": 0.5, "fairy": 1},
-            "ghost": {"Normal": 0, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 1, "poison": 1, "ground": 1, "flying": 1, "psychic": 2, "bug": 1, "rock": 1, "ghost": 2, "dragon": 1, "dark": 0.5, "steel": 1, "fairy": 1},
-            "dragon": {"Normal": 1, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 1, "poison": 1, "ground": 1, "flying": 1, "psychic": 1, "bug": 1, "rock": 1, "ghost": 1, "dragon": 2, "dark": 1, "steel": 0.5, "fairy": 0},
-            "dark": {"Normal": 1, "fire": 1, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 0.5, "poison": 1, "ground": 1, "flying": 1, "psychic": 2, "bug": 1, "rock": 1, "ghost": 2, "dragon": 1, "dark": 0.5, "steel": 1, "fairy": 0.5},
-            "steel": {"Normal": 1, "fire": 0.5, "water": 0.5, "electric": 0.5, "grass": 1, "ice": 2, "fighting": 1, "poison": 1, "ground": 1, "flying": 1, "psychic": 1, "bug": 1, "rock": 2, "ghost": 1, "dragon": 1, "dark": 1, "steel": 0.5, "fairy": 2},
-            "fairy": {"Normal": 1, "fire": 0.5, "water": 1, "electric": 1, "grass": 1, "ice": 1, "fighting": 2, "poison": 0.5, "ground": 1, "flying": 1, "psychic": 1, "bug": 1, "rock": 1, "ghost": 1, "dragon": 2, "dark": 2, "steel": 0.5, "fairy": 1}
-        }
-        return type_effectiveness[attacker_type].get(defender_type, 1)
+    def damage_effectiveness(self, attack_type, defender):
+        defender_types = defender.types if defender.types else ["normal"]
+        multiplier = 1
 
-    def apply_damage(self, attacker, defender):
-        damage_multiplied = attacker.attack_power * self.damage_effectiveness(attacker, defender)
-        damage = damage_multiplied - defender.defense
-        defender.life_points -= damage
-        return defender.life_points
+        for defender_type in defender_types:
+            if attack_type in type_chart:
+                if defender_type in type_chart[attack_type]["double_damage_to"]:
+                    multiplier *= 2
+                elif defender_type in type_chart[attack_type]["half_damage_to"]:
+                    multiplier *= 0.5
+                elif defender_type in type_chart[attack_type]["no_damage_to"]:
+                    multiplier *= 0
+        
+        return multiplier
+
+    def apply_damage(self, attacker, defender, attack):
+        if attack.use():  # Vérifie si l'attaque a encore des PP
+            effectiveness = self.damage_effectiveness(attack.attack_type, defender)
+
+            level = attacker.level
+            attack_stat = attacker.stats.get("attack", 10)
+            defense_stat = defender.stats.get("defense", 5)
+            power = attack.power
+
+            # Formule de dégâts
+            base_damage = (((2 * level / 5 + 2) * power * (attack_stat / defense_stat)) / 50) + 2
+            base_damage *= effectiveness
+
+            # Facteur aléatoire
+            base_damage *= random.uniform(0.85, 1.0)
+
+            # Coup critique (1/16 chance)
+            critical = random.random() < 1/16
+            if critical:
+                base_damage *= 2
+
+            damage = max(1, int(base_damage))
+            defender.stats["hp"] -= damage
+
+            # Mostrar el daño recibido
+            defender.damage_text = str(damage)
+            defender.damage_timer = 50  # Duración en frames (1 segundo a 60 FPS)
+            # Crear efecto visual basado en el tipo de ataque
+            effect_x = defender.position[0] if hasattr(defender, 'position') else 400
+            effect_y = defender.position[1] if hasattr(defender, 'position') else 300
+            effect = Effect(effect_x, effect_y, attack.attack_type)
+            self.current_effects.append(effect)
+
+            # Appliquer un modificateur de stat si l'attaque en a un
+            stat_change = None
+            if attack.stat_modifier:
+                stat_change = attack.stat_modifier.apply(defender)
+
+            return damage, effectiveness, critical, stat_change
+        return 0, 1, False, None  # Si pas de PP, pas de dégâts
 
     def winner(self):
-        if self.enemy.life_points <= 0:
-            winner=self.player.name
-            loser=self.enemy.name
-            return winner, loser
-        elif self.player.life_points <= 0:
-            winner=self.enemy.name
-            loser=self.player.name
-            return winner, loser
-        else:
-            return None, None
-    
-    def send_to_pokedex(self, loser, winner):
-        with open(pokedex_json_path, "r") as file:
-            pokedex = json.load(file)
-        
-        if loser == self.enemy.name:
-            pokedex[self.enemy.name] = {
-                "types": self.enemy.types,
-                "attack_power": self.enemy.attack_power,
-                "defense": self.enemy.defense,
-                "life_points": self.enemy.life_points
-            }
-        
-        if winner == self.player.name:
-            pokedex[self.player.name] = {
-                "types": self.player.types,
-                "attack_power": self.player.attack_power,
-                "defense": self.player.defense,
-                "life_points": self.player.life_points
-            }
-        
-        with open(pokedex_json_path, "w") as file:
-            json.dump(pokedex, file, indent=4)
+        if self.enemy.stats["hp"] <= 0:
+            return self.player.name, self.enemy.name
+        elif self.player.stats["hp"] <= 0:
+            return self.enemy.name, self.player.name
+        return None, None
 
+    def update_effects(self):
+        # Actualizar efectos existentes
+        for effect in self.current_effects[:]:  # Usar una copia de la lista para poder modificarla
+            effect.update()
+            if effect.is_finished():
+                self.current_effects.remove(effect)
 
-#############
-
-# Creating Pokemon instances
-player = Pokemon(name="Pikachu", types=["electric","ghost"], attack_power=55, defense=40, life_points=100, level=1, x=0, y=0)
-enemy = Pokemon(name="Charmander", types=["fire"], attack_power=52, defense=43, life_points=100, level=1, x=0, y=0)
-
-# Create a Combat instance
-combat = Combat(player, enemy)
-
-# Apply damage and determine the winner
-print(enemy.life_points)
-combat.apply_damage(player, enemy)
-combat.apply_damage(player, enemy)
-print(enemy.life_points)
-combat.apply_damage(player, enemy)
-combat.apply_damage(player, enemy)
-print(enemy.life_points)
-combat.apply_damage(player, enemy)
-combat.apply_damage(player, enemy)
-print(enemy.life_points)
-combat.apply_damage(player, enemy)
-combat.apply_damage(player, enemy)
-print(enemy.life_points)
-combat.apply_damage(player, enemy)
-print(enemy.life_points)
-winner, loser = combat.winner()
-print(f"Winner: {winner}, Loser: {loser}")
-
-# Send to the Pokedex the loser if it is the enemy 
-# and the player's Pokemon if he/she has won
-combat.send_to_pokedex(loser, winner)
+    def draw_effects(self, screen):
+        # Dibujar todos los efectos activos
+        for effect in self.current_effects:
+            effect.draw(screen)

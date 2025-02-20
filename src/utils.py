@@ -10,6 +10,6 @@ def draw_text(screen, text, x, y, font_size=25, color=(255,255,255)):
     :param font_size: tamaño de la fuente (default: 30)
     :param color: color del texto en formato RGB (default: blanco)
     """
-    font = pygame.font.Font('Consolab.ttf', font_size - 10)
+    font = pygame.font.Font('assets/fonts/Consolab.ttf', font_size - 10)
     text_surface = font.render(text, True, color)
     screen.blit(text_surface, (x, y))

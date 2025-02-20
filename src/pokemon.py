@@ -95,7 +95,7 @@ class Pokemon:
 
         # Mostrar el texto de daño si existe
         if self.damage_text and self.damage_timer > 0:
-            font = pygame.font.Font('Consolab.ttf', 26)
+            font = pygame.font.Font('assets/fonts/Consolab.ttf', 26)
             text = font.render(f"-{self.damage_text}", True, (255, 0, 0))  # Texto rojo
             # Posición del texto: encima de la cabeza del pokémon
             if not self.damage_pos:

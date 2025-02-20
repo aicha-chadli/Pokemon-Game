@@ -1,5 +1,5 @@
 import json
-from pokemon import Pokemon
+from .pokemon import Pokemon
 
 class Pokedex:
     def __init__(self):

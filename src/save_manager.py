@@ -2,7 +2,7 @@ import json
 import os
 
 class SaveManager:
-    SAVE_FILE = "last_battle.json"
+    SAVE_FILE = "data/last_battle.json"
 
     @staticmethod
     def save_battle(player_pokemon, opponent_pokemon):

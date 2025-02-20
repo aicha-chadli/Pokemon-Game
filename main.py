@@ -1,5 +1,5 @@
 import pygame
-from menu import MainMenu
+from src.menu import MainMenu
 
 def main():
     pygame.init()
