@@ -14,7 +14,8 @@ class Pokemon:
         self.data = self._fetch_pokemon_data()
         self.types = self.data.get("types", [])
         self.stats = self.data.get("stats", {"hp": 100})  # Default HP if not present
-        self.image = self._load_image()
+        self.front_image = self._load_image("front")
+        self.back_image = self._load_image("back")
         self.moves = self._fetch_pokemon_moves()
         
         # Attributs pour les effets visuels
@@ -45,12 +46,21 @@ class Pokemon:
         return []
 
 
-    def _load_image(self):
+    def _load_image(self, view_type="front"):
         if "id" in self.data:
-            response = requests.get(f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{self.data['id']}.png")
+            # Construir la URL según el tipo de vista
+            if view_type == "back":
+                url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/{self.data['id']}.png"
+            else:
+                url = f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{self.data['id']}.png"
+            
+            response = requests.get(url)
             if response.status_code == 200:
-                image = pygame.image.load(BytesIO(response.content)).convert_alpha()
-                return pygame.transform.scale(image, (100, 100))
+                try:
+                    image = pygame.image.load(BytesIO(response.content)).convert_alpha()
+                    return pygame.transform.scale(image, (100, 100))
+                except:
+                    return None
         return None
 
     def get_random_move(self):
@@ -65,7 +75,7 @@ class Pokemon:
         
         return damage
 
-    def draw(self, screen, x, y):
+    def draw(self, screen, x, y, is_player=False):
         """Dessiner l'image du Pokémon avec un léger effet de secousse en cas de défense active"""
         draw_x, draw_y = x, y
         # Si un effet de défense est actif, on applique un petit décalage (secousse)
@@ -74,8 +84,14 @@ class Pokemon:
             draw_x += random.randint(-offset, offset)
             draw_y += random.randint(-offset, offset)
 
-        if self.image:
-            screen.blit(self.image, (draw_x, draw_y))
+        # Seleccionar la imagen correcta según si es el jugador o no
+        image_to_use = self.back_image if is_player else self.front_image
+        
+        # Si la imagen seleccionada no está disponible, usar la frontal como respaldo
+        if not image_to_use:
+            image_to_use = self.front_image
+        if image_to_use:
+            screen.blit(image_to_use, (draw_x, draw_y))
 
         # Mostrar el texto de daño si existe
         if self.damage_text and self.damage_timer > 0:
@@ -83,7 +99,7 @@ class Pokemon:
             text = font.render(f"-{self.damage_text}", True, (255, 0, 0))  # Texto rojo
             # Posición del texto: encima de la cabeza del pokémon
             if not self.damage_pos:
-                self.damage_pos = [draw_x + self.image.get_width() // 2, draw_y - 20]
+                self.damage_pos = [draw_x + image_to_use.get_width() // 2, draw_y - 20]
             # Hacer que el texto suba y se desvanezca
             self.damage_pos[1] -= 0.3  # Mover hacia arriba
             alpha = int(255 * (self.damage_timer / 60))  # Desvanecer gradualmente

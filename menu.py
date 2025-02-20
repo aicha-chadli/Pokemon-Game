@@ -5,6 +5,7 @@ from utils import draw_text
 from game import Game
 from save_manager import SaveManager
 from pokedex import Pokedex
+from sound_manager import SoundManager
 
 
 class MainMenu:
@@ -12,6 +13,10 @@ class MainMenu:
         self.screen = screen
         self.pokemon_names = Pokemon.get_pokemon_names()
         self.current_index = 0
+
+        # Inicializar el gestor de sonido
+        self.sound_manager = SoundManager()
+        
         self.background_main_menu = pygame.image.load('background_pokemon.jpg')
         self.background_main_menu = pygame.transform.scale(self.background_main_menu, (800, 600))
         self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
@@ -60,6 +65,9 @@ class MainMenu:
         running = True
         clock = pygame.time.Clock()
         pokedex = Pokedex()
+
+        # Reproducir música del menú
+        self.sound_manager.play_music('menu')
 
         while running:
             self.screen.blit(self.background_main_menu, (0, 0))
@@ -150,6 +158,10 @@ class MainMenu:
 
     def launch_game(self):
         running = True
+        
+        # Reproducir música del menú de selección
+        self.sound_manager.play_music('menu')
+
         while running:
             scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
             scaled_bg = pygame.transform.scale(self.background_pokchoice, (int(800 * scale_factor), int(600 * scale_factor)))
@@ -158,8 +170,8 @@ class MainMenu:
 
             draw_text(self.screen, self.selected_pokemon.name.capitalize(), 350, 130)
 
-            if self.selected_pokemon.image:
-                scaled_image = pygame.transform.scale(self.selected_pokemon.image, (200, 200))
+            if self.selected_pokemon.front_image:  # Cambiado de image a front_image
+                scaled_image = pygame.transform.scale(self.selected_pokemon.front_image, (200, 200))
                 image_rect = scaled_image.get_rect(center=(400, 250))
                 self.screen.blit(scaled_image, image_rect.topleft)
             else:
@@ -192,6 +204,7 @@ class MainMenu:
                         self.current_index = (self.current_index + 1) % len(self.pokemon_names)
                     elif event.key == pygame.K_c:
                         game = Game(self.screen, self.selected_pokemon)
+                        game.sound_manager = self.sound_manager  # Pasar el gestor de sonido
                         game.run()
                         running = False
 
@@ -209,6 +222,7 @@ class MainMenu:
                             self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
                         elif choose_poke_rect.collidepoint(event.pos):
                             game = Game(self.screen, self.selected_pokemon)
+                            game.sound_manager = self.sound_manager  # Pasar el gestor de sonido
                             game.run()
                             running = False
 
@@ -219,6 +233,9 @@ class MainMenu:
 
     def open_pokedex(self, pokedex):
         running = True
+        
+        # Reproducir música de la pokédex
+        self.sound_manager.play_music('pokedex')
         page = 0
         items_per_page = 1
 
@@ -253,8 +270,8 @@ class MainMenu:
                     pokemon_data = captured_pokemon[i]
                     try:
                         pokemon = Pokemon(pokemon_data["name"])
-                        if pokemon.image:
-                            scaled_image = pygame.transform.scale(pokemon.image, (150, 150))
+                        if pokemon.front_image:
+                            scaled_image = pygame.transform.scale(pokemon.front_image, (150, 150))
                             image_rect = scaled_image.get_rect(center=(400, 220))
                             self.screen.blit(scaled_image, image_rect)
 

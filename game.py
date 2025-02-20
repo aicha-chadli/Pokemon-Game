@@ -15,16 +15,30 @@ class Game:
         # Si se proporciona un oponente específico, usarlo, sino elegir uno aleatorio
         self.opponent_pokemon = opponent_pokemon if opponent_pokemon else self.get_random_pokemon(player_pokemon.name)
         self.background = pygame.image.load("battle_pokemon.jpg")
+        self.sound_manager = None  # Será establecido por el menú principal
         self.background = pygame.transform.scale(self.background, (800, 600))
 
         # Agrandissement des sprites
         self.scale_factor = 2
-        self.player_pokemon.image = pygame.transform.scale(self.player_pokemon.image, 
-                                                      (self.player_pokemon.image.get_width() * self.scale_factor, 
-                                                       self.player_pokemon.image.get_height() * self.scale_factor))
-        self.opponent_pokemon.image = pygame.transform.scale(self.opponent_pokemon.image, 
-                                                         (self.opponent_pokemon.image.get_width() * self.scale_factor, 
-                                                          self.opponent_pokemon.image.get_height() * self.scale_factor))
+
+        # Escalar la imagen frontal y trasera del Pokémon del jugador
+        if self.player_pokemon.front_image:
+           self.player_pokemon.front_image = pygame.transform.scale(
+                self.player_pokemon.front_image,
+                (self.player_pokemon.front_image.get_width() * self.scale_factor,
+                 self.player_pokemon.front_image.get_height() * self.scale_factor))
+        if self.player_pokemon.back_image:
+            self.player_pokemon.back_image = pygame.transform.scale(
+                self.player_pokemon.back_image,
+                (self.player_pokemon.back_image.get_width() * self.scale_factor,
+                 self.player_pokemon.back_image.get_height() * self.scale_factor))
+
+        # Escalar la imagen del oponente (solo necesitamos la frontal)
+        if self.opponent_pokemon.front_image:
+            self.opponent_pokemon.front_image = pygame.transform.scale(
+                self.opponent_pokemon.front_image,
+                (self.opponent_pokemon.front_image.get_width() * self.scale_factor,
+                self.opponent_pokemon.front_image.get_height() * self.scale_factor))
 
         self.time = 0
         self.amplitude = 10
@@ -40,9 +54,9 @@ class Game:
         # Ajout des attaques possibles
         self.player_moves = [
             Attack("Charge", "normal", 40, 35),
-            Attack("Flammèche", "fire", 40, 25),
-            Attack("Pistolet à O", "water", 40, 25),
-            Attack("Griffe", "normal", 50, 30)
+            Attack("Ember", "fire", 40, 25),
+            Attack("Water Gun", "water", 40, 25),
+            Attack("Scratch", "normal", 50, 30)
         ]
 
         # Guardar la batalla actual
@@ -104,6 +118,10 @@ class Game:
         running = True
         clock = pygame.time.Clock()
 
+        # Reproducir música de combate
+        if self.sound_manager:
+            self.sound_manager.play_music('combat')
+
         while running:
             self.screen.blit(self.background, (0, 0))
 
@@ -121,8 +139,8 @@ class Game:
             self.combat.update_effects()
 
             # Dessiner les Pokémon avec leurs effets visuels
-            self.player_pokemon.draw(self.screen, player_x, player_y)
-            self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
+            self.player_pokemon.draw(self.screen, player_x, player_y, is_player=True)
+            self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y, is_player=False)
 
             # Dibujar los efectos visuales
             self.combat.draw_effects(self.screen)

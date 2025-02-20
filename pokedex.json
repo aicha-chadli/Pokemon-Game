@@ -76,5 +76,82 @@
             "speed": 45
         },
         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/magnemite.png"
+    },
+    {
+        "name": "caterpie",
+        "types": [
+            "bug"
+        ],
+        "stats": {
+            "hp": 45,
+            "attack": 30,
+            "defense": 35,
+            "special-attack": 20,
+            "special-defense": 20,
+            "speed": 45
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/caterpie.png"
+    },
+    {
+        "name": "marowak",
+        "types": [
+            "ground"
+        ],
+        "stats": {
+            "hp": 60,
+            "attack": 80,
+            "defense": 110,
+            "special-attack": 50,
+            "special-defense": 80,
+            "speed": 45
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/marowak.png"
+    },
+    {
+        "name": "seel",
+        "types": [
+            "water"
+        ],
+        "stats": {
+            "hp": 65,
+            "attack": 45,
+            "defense": 55,
+            "special-attack": 45,
+            "special-defense": 70,
+            "speed": 45
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/seel.png"
+    },
+    {
+        "name": "kakuna",
+        "types": [
+            "bug",
+            "poison"
+        ],
+        "stats": {
+            "hp": 45,
+            "attack": 25,
+            "defense": 50,
+            "special-attack": 25,
+            "special-defense": 25,
+            "speed": 35
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/kakuna.png"
+    },
+    {
+        "name": "gloom",
+        "types": [
+            "grass",
+            "poison"
+        ],
+        "stats": {
+            "hp": 60,
+            "attack": 65,
+            "defense": 70,
+            "special-attack": 85,
+            "special-defense": 75,
+            "speed": 40
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/gloom.png"
     }
 ]

@@ -15,7 +15,7 @@ class Pokedex:
 
     def add_pokemon(self, pokemon_name):
         pokemon = Pokemon(pokemon_name)
-        if pokemon.image and pokemon_name.lower() not in [p["name"].lower() for p in self.pokedex]:
+        if pokemon.front_image and pokemon_name.lower() not in [p["name"].lower() for p in self.pokedex]:
             self.pokedex.append({
                 "name": pokemon.name,
                 "types": pokemon.types,
