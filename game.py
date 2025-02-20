@@ -72,9 +72,9 @@ class Game:
         for i, message in enumerate(self.message_log):
             # Determinar el color basado en el contenido del mensaje
             if self.player_pokemon.name.lower() in message.lower():
-                color = (90, 223, 42)  # Verde para mensajes del jugador
+                color = (20, 20, 254)  # Verde para mensajes del jugador
             elif self.opponent_pokemon.name.lower() in message.lower():
-                color = (254, 59, 74)  # Rojo para mensajes del oponente
+                color = (254, 20, 20)  # Rojo para mensajes del oponente
             else:
                 # Para mensajes genéricos como "Critical hit!" o "It's super effective!"
                 # Usar el color del último pokémon que atacó
@@ -100,11 +100,11 @@ class Game:
             self.player_pokemon.draw(self.screen, player_x, player_y)
             self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
 
-            draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 60, 540)
-            draw_text(self.screen, f"HP: {self.player_pokemon.stats['hp']}", 85, 565)     # Affichage des points de vie
+            draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 60, 540, 30)
+            draw_text(self.screen, f"HP: {self.player_pokemon.stats['hp']}", 85, 565, 30)     # Affichage des points de vie
 
-            draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 565, 300)
-            draw_text(self.screen, f"HP: {self.opponent_pokemon.stats['hp']}", 590, 325)    # Affichage des points de vie
+            draw_text(self.screen, f"Opponent: {self.opponent_pokemon.name.capitalize()}", 545, 300, 30)
+            draw_text(self.screen, f"HP: {self.opponent_pokemon.stats['hp']}", 570, 325, 30)    # Affichage des points de vie
 
 
 
@@ -142,7 +142,7 @@ class Game:
                 self.screen.blit(overlay, (0, 0))
 
                 # Mostrar mensaje del ganador en grande y centrado
-                font = pygame.font.Font(None, 74)  # Fuente más grande
+                font = pygame.font.Font('Consolab.ttf', 64)  # Fuente más grande
                 text = font.render(f"{winner.capitalize()} WINS!", True, (255, 215, 0))  # Color dorado
                 text_rect = text.get_rect(center=(400, 300))  # Centrado en la pantalla
                 self.screen.blit(text, text_rect)
@@ -154,7 +154,7 @@ class Game:
         """ Affichage des attaques disponibles avec leurs PP restants """
         for i, move in enumerate(self.player_moves):
             move_text = f"{i + 1}. {move.name} ({move.pp} PP)"
-            draw_text(self.screen, move_text, 345, 460 + (i * 25), 25, (20,20,20))
+            draw_text(self.screen, move_text, 345, 460 + (i * 25), 25, (50,50,50))
 
     def player_attack(self, attack):
         """ Exécute une attaque du joueur """

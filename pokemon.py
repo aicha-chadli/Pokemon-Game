@@ -4,6 +4,7 @@ import pygame
 import random
 import math
 
+
 # Initialisation de Pygame (n'oublie pas d'appeler pygame.init() dans ton programme principal)
 pygame.init()
 
@@ -82,13 +83,13 @@ class Pokemon:
 
         # Mostrar el texto de daño si existe
         if self.damage_text and self.damage_timer > 0:
-            font = pygame.font.Font(None, 36)
+            font = pygame.font.Font('Consolab.ttf', 26)
             text = font.render(f"-{self.damage_text}", True, (255, 0, 0))  # Texto rojo
             # Posición del texto: encima de la cabeza del pokémon
             if not self.damage_pos:
                 self.damage_pos = [draw_x + self.image.get_width() // 2, draw_y - 20]
             # Hacer que el texto suba y se desvanezca
-            self.damage_pos[1] -= 1  # Mover hacia arriba
+            self.damage_pos[1] -= 0.3  # Mover hacia arriba
             alpha = int(255 * (self.damage_timer / 60))  # Desvanecer gradualmente
             text.set_alpha(alpha)
             text_rect = text.get_rect(center=(self.damage_pos[0], self.damage_pos[1]))
