@@ -3,18 +3,15 @@ from pokemon import Pokemon
 
 class Pokedex:
     def __init__(self):
+        self.pokedex_files = "pokedex.json"
         self.pokedex = self._load_pokedex()
 
     def _load_pokedex(self):
         try:
             with open("pokedex.json", "r") as file:
                 return json.load(file)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             return []
-
-    def save_pokedex(self):
-        with open("pokedex.json", "w") as file:
-            json.dump(self.pokedex, file, indent=4)
 
     def add_pokemon(self, pokemon_name):
         pokemon = Pokemon(pokemon_name)
@@ -26,5 +23,13 @@ class Pokedex:
                 "sprite": f"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/{pokemon_name.lower()}.png"
             })
             self.save_pokedex()
+
+            self.pokedex = self._load_pokedex() 
         else:
             print("❌ Pokémon introuvable ou déjà dans le Pokédex !")
+
+    def save_pokedex(self):
+        with open("pokedex.json", "w") as file:
+            json.dump(self.pokedex, file, indent=4)
+
+    

@@ -1,6 +1,56 @@
 [
     {
-        "name": "Pikachu",
+        "name": "charizard",
+        "types": [
+            "fire",
+            "flying"
+        ],
+        "stats": {
+            "hp": 78,
+            "attack": 84,
+            "defense": 78,
+            "special-attack": 109,
+            "special-defense": 85,
+            "speed": 100
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/charizard.png"
+    },
+    {
+        "name": "weepinbell",
+        "types": [
+            "grass",
+            "poison"
+        ],
+        "stats": {
+            "hp": 65,
+            "attack": 90,
+            "defense": 50,
+            "special-attack": 85,
+            "special-defense": 45,
+            "speed": 55
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/weepinbell.png"
+    },
+    {
+        "name": "drowzee",
+        "types": [
+            "psychic"
+        ],
+        "stats": {
+            "hp": 60,
+            "attack": 48,
+            "defense": 45,
+            "special-attack": 43,
+            "special-defense": 90,
+            "speed": 42
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/drowzee.png"
+    },
+    {
+        "name": "pikachu",
+        "types": [
+            "electric"
+        ],
         "stats": {
             "hp": 35,
             "attack": 55,
@@ -9,18 +59,22 @@
             "special-defense": 50,
             "speed": 90
         },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/pikachu.png"
     },
     {
-        "name": "Arcanine",
+        "name": "magnemite",
+        "types": [
+            "electric",
+            "steel"
+        ],
         "stats": {
-            "hp": 90,
-            "attack": 110,
-            "defense": 80,
-            "special-attack": 100,
-            "special-defense": 80,
-            "speed": 95
+            "hp": 25,
+            "attack": 35,
+            "defense": 70,
+            "special-attack": 95,
+            "special-defense": 55,
+            "speed": 45
         },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/59.png"
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/magnemite.png"
     }
 ]
