@@ -258,7 +258,7 @@ class MainMenu:
 
         while running:
             # Effet de pulsation (optimisé)
-            scale_factor = 1 + math.sin(self.frame * self.pulse_speed) * self.pulse_amplitude1
+            scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
             scaled_bg = pygame.transform.scale(background, (int(800 * scale_factor), int(600 * scale_factor)))  # Utiliser l'image préchargée
             bg_rect = scaled_bg.get_rect(center=(400, 300))
             self.screen.blit(scaled_bg, bg_rect.topleft)
@@ -299,7 +299,7 @@ class MainMenu:
 
             else:
                 text_surface = name_font.render("No Pokémon captured yet!", True, (0, 0, 0))  # Utilisation de la police plus grande
-                text_rect = text_surface.get_rect(center=(400, 300))
+                text_rect = text_surface.get_rect(center=(400, 230))
                 self.screen.blit(text_surface, text_rect)
 
             pygame.display.flip()

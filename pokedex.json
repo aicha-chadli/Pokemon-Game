@@ -1,174 +1,33 @@
 [
     {
-        "name": "dratini",
-        "types": [
-            "dragon"
-        ],
-        "stats": {
-            "hp": 41,
-            "attack": 64,
-            "defense": 45,
-            "special-attack": 50,
-            "special-defense": 50,
-            "speed": 50
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/dratini.png"
-    },
-    {
-        "name": "electrode",
-        "types": [
-            "electric"
-        ],
-        "stats": {
-            "hp": 60,
-            "attack": 50,
-            "defense": 70,
-            "special-attack": 80,
-            "special-defense": 80,
-            "speed": 150
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/electrode.png"
-    },
-    {
-        "name": "weepinbell",
-        "types": [
-            "grass",
-            "poison"
-        ],
-        "stats": {
-            "hp": 65,
-            "attack": 90,
-            "defense": 50,
-            "special-attack": 85,
-            "special-defense": 45,
-            "speed": 55
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/weepinbell.png"
-<<<<<<< HEAD
-    },
-    {
-        "name": "drowzee",
-        "types": [
-            "psychic"
-        ],
-        "stats": {
-            "hp": 60,
-            "attack": 48,
-            "defense": 45,
-            "special-attack": 43,
-            "special-defense": 90,
-            "speed": 42
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/drowzee.png"
-    },
-    {
-        "name": "pikachu",
-        "types": [
-            "electric"
-        ],
-        "stats": {
-            "hp": 35,
-            "attack": 55,
-            "defense": 40,
-            "special-attack": 50,
-            "special-defense": 50,
-            "speed": 90
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/pikachu.png"
-    },
-    {
-        "name": "magnemite",
-        "types": [
-            "electric",
-            "steel"
-        ],
-        "stats": {
-            "hp": 25,
-            "attack": 35,
-            "defense": 70,
-            "special-attack": 95,
-            "special-defense": 55,
-            "speed": 45
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/magnemite.png"
-    },
-    {
-        "name": "caterpie",
-        "types": [
-            "bug"
-        ],
-        "stats": {
-            "hp": 45,
-            "attack": 30,
-            "defense": 35,
-            "special-attack": 20,
-            "special-defense": 20,
-            "speed": 45
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/caterpie.png"
-    },
-    {
-        "name": "marowak",
-        "types": [
-            "ground"
-        ],
-        "stats": {
-            "hp": 60,
-            "attack": 80,
-            "defense": 110,
-            "special-attack": 50,
-            "special-defense": 80,
-            "speed": 45
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/marowak.png"
-    },
-    {
-        "name": "seel",
-        "types": [
-            "water"
-        ],
-        "stats": {
-            "hp": 65,
-            "attack": 45,
-            "defense": 55,
-            "special-attack": 45,
-            "special-defense": 70,
-            "speed": 45
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/seel.png"
-    },
-    {
-        "name": "kakuna",
+        "name": "parasect",
         "types": [
             "bug",
-            "poison"
-        ],
-        "stats": {
-            "hp": 45,
-            "attack": 25,
-            "defense": 50,
-            "special-attack": 25,
-            "special-defense": 25,
-            "speed": 35
-        },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/kakuna.png"
-    },
-    {
-        "name": "gloom",
-        "types": [
-            "grass",
-            "poison"
+            "grass"
         ],
         "stats": {
             "hp": 60,
-            "attack": 65,
-            "defense": 70,
-            "special-attack": 85,
-            "special-defense": 75,
-            "speed": 40
+            "attack": 95,
+            "defense": 80,
+            "special-attack": 60,
+            "special-defense": 80,
+            "speed": 30
         },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/gloom.png"
-=======
->>>>>>> 9e3415f4c89efe474529b799fc7a12bce0a97a2b
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/parasect.png"
+    },
+    {
+        "name": "hitmonchan",
+        "types": [
+            "fighting"
+        ],
+        "stats": {
+            "hp": 50,
+            "attack": 105,
+            "defense": 79,
+            "special-attack": 35,
+            "special-defense": 110,
+            "speed": 76
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/hitmonchan.png"
     }
 ]
