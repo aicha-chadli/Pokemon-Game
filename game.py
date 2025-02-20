@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import requests
 from pokemon import Pokemon
 from utils import draw_text
 from combat import Combat
@@ -48,15 +49,31 @@ class Game:
         SaveManager.save_battle(self.player_pokemon, self.opponent_pokemon)
 
     def get_random_pokemon(self, excluded_pokemon_name):
-        """Obtiene un pokémon aleatorio excluyendo el nombre proporcionado"""
-        pokemon_list = ["pikachu", "bulbasaur", "charmander", "squirtle", "jigglypuff", "eevee", "snorlax", "mewtwo"]
-        pokemon_list = [p for p in pokemon_list if p.lower() != excluded_pokemon_name.lower()]
+        """Récupère un Pokémon aléatoire parmi les 150 premiers de la PokéAPI, en excluant le Pokémon choisi."""
         
-        if not pokemon_list:
-            return Pokemon("pikachu")
+        api_url = "https://pokeapi.co/api/v2/pokemon?limit=150"
         
-        random_pokemon_name = random.choice(pokemon_list)
-        return Pokemon(random_pokemon_name)
+        try:
+            response = requests.get(api_url)
+            response.raise_for_status()  # Vérifie que la requête s'est bien passée
+            data = response.json()
+            
+            # Liste des noms de Pokémon
+            pokemon_list = [p["name"] for p in data["results"]]
+            
+            # Exclure le Pokémon choisi par le joueur
+            pokemon_list = [p for p in pokemon_list if p.lower() != excluded_pokemon_name.lower()]
+            
+            # Sélection aléatoire d'un Pokémon
+            if pokemon_list:
+                random_pokemon_name = random.choice(pokemon_list)
+                return Pokemon(random_pokemon_name)
+            
+        except requests.RequestException as e:
+            print(f"Erreur lors de la récupération des Pokémon : {e}")
+                
+    # Si une erreur se produit, ou si la liste est vide, on choisit un Pokémon par défaut
+        return Pokemon("pikachu")
 
     def add_message(self, message):
         """Añade un mensaje al log"""
@@ -134,21 +151,34 @@ class Game:
 
             if self.player_pokemon.stats["hp"] <= 0 or self.opponent_pokemon.stats["hp"] <= 0:
                 self.game_over = True
-                winner = self.player_pokemon.name if self.opponent_pokemon.stats["hp"] <= 0 else self.opponent_pokemon.name
-                # Crear una superficie semitransparente para el fondo del mensaje
+
+                # Déterminer le gagnant
+                if self.opponent_pokemon.stats["hp"] <= 0:
+                    winner = self.player_pokemon.name
+                else:
+                    winner = self.opponent_pokemon.name
+
+                # Si le joueur gagne, ajouter le Pokémon vaincu au Pokédex
+                if winner == self.player_pokemon.name:
+                    from pokedex import Pokedex  # Import du Pokédex
+                    pokedex = Pokedex()  # Création d'une instance du Pokédex
+                    pokedex.add_pokemon(self.opponent_pokemon.name)  # Ajout du Pokémon vaincu
+                    pokedex.save_pokedex()  # Recharger le Pokédex après l'ajout pour refléter les changements
+
+                # Afficher l'écran de victoire/défaite
                 overlay = pygame.Surface((800, 600))
                 overlay.set_alpha(128)
                 overlay.fill((0, 0, 0))
                 self.screen.blit(overlay, (0, 0))
 
-                # Mostrar mensaje del ganador en grande y centrado
-                font = pygame.font.Font('Consolab.ttf', 64)  # Fuente más grande
-                text = font.render(f"{winner.capitalize()} WINS!", True, (255, 215, 0))  # Color dorado
-                text_rect = text.get_rect(center=(400, 300))  # Centrado en la pantalla
+                font = pygame.font.Font('Consolab.ttf', 64)
+                text = font.render(f"{winner.capitalize()} WINS!", True, (255, 215, 0))
+                text_rect = text.get_rect(center=(400, 300))
                 self.screen.blit(text, text_rect)
                 pygame.display.flip()
                 pygame.time.wait(3000)
                 running = False
+
 
     def display_attack_options(self):
         """ Affichage des attaques disponibles avec leurs PP restants """

@@ -30,5 +30,20 @@
             "speed": 55
         },
         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/weepinbell.png"
+    },
+    {
+        "name": "drowzee",
+        "types": [
+            "psychic"
+        ],
+        "stats": {
+            "hp": 60,
+            "attack": 48,
+            "defense": 45,
+            "special-attack": 43,
+            "special-defense": 90,
+            "speed": 42
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/drowzee.png"
     }
 ]
