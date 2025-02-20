@@ -4,6 +4,7 @@ from pokemon import Pokemon
 from utils import draw_text
 from game import Game
 from save_manager import SaveManager
+from pokedex import Pokedex
 
 class MainMenu:
     def __init__(self, screen):
@@ -57,6 +58,7 @@ class MainMenu:
     def run(self):
         running = True
         clock = pygame.time.Clock()
+        pokedex = Pokedex()
 
         while running:
             self.screen.blit(self.background_main_menu, (0, 0))
@@ -119,6 +121,9 @@ class MainMenu:
                             self.load_last_battle()
                         elif self.button_quit_rect.collidepoint(event.pos):
                             running = False
+                        elif self.button_pokeball_rect.collidepoint(event.pos):
+                            self.open_pokedex(pokedex)  # Open Pokedex
+                            self.frame = 0 # Reset animation frame
 
                         self.attack_effect = None
                         self.defense_effect = None
@@ -145,21 +150,13 @@ class MainMenu:
     def launch_game(self):
         running = True
         while running:
-            # Calculer le facteur de mise à l'échelle pour l'effet pulse sur le fond
             scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
-            # Redimensionner l'image de fond en fonction du facteur de pulsation
-            scaled_bg = pygame.transform.scale(
-                self.background_pokchoice, 
-                (int(800 * scale_factor), int(600 * scale_factor))
-            )
-            # Centrer l'image redimensionnée (écran de 800x600, centre en (400,300))
+            scaled_bg = pygame.transform.scale(self.background_pokchoice, (int(800 * scale_factor), int(600 * scale_factor)))
             bg_rect = scaled_bg.get_rect(center=(400, 300))
             self.screen.blit(scaled_bg, bg_rect.topleft)
 
-            # Afficher le nom du Pokémon en haut (centré)
             draw_text(self.screen, self.selected_pokemon.name.capitalize(), 350, 130)
 
-            # Afficher et agrandir l'image du Pokémon
             if self.selected_pokemon.image:
                 scaled_image = pygame.transform.scale(self.selected_pokemon.image, (200, 200))
                 image_rect = scaled_image.get_rect(center=(400, 250))
@@ -167,19 +164,16 @@ class MainMenu:
             else:
                 image_rect = pygame.Rect(400 - 100, 250 - 100, 200, 200)
 
-            # Positionner et afficher les flèches
             arrow_left_rect = self.arrow_left_image.get_rect(center=(image_rect.left - 50, image_rect.centery))
             self.screen.blit(self.arrow_left_image, arrow_left_rect.topleft)
             arrow_right_rect = self.arrow_right_image.get_rect(center=(image_rect.right + 50, image_rect.centery))
             self.screen.blit(self.arrow_right_image, arrow_right_rect.topleft)
 
-            # Afficher les stats du Pokémon sous l'image, décalées à gauche
             y_offset = image_rect.bottom - 15
             for stat, value in self.selected_pokemon.stats.items():
                 draw_text(self.screen, f"{stat.capitalize()}: {value}", 330, y_offset)
                 y_offset += 20
 
-            # Ajouter le bouton choose_poke en dessous des stats
             choose_poke_rect = self.choose_poke_image.get_rect(center=(400, y_offset + 40))
             self.screen.blit(self.choose_poke_image, choose_poke_rect.topleft)
 
@@ -189,7 +183,7 @@ class MainMenu:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:  # Retour au menu principal
+                    if event.key == pygame.K_ESCAPE:
                         return
                     elif event.key == pygame.K_LEFT:
                         self.current_index = (self.current_index - 1) % len(self.pokemon_names)
@@ -200,29 +194,104 @@ class MainMenu:
                         game.run()
                         running = False
 
-                    # Mise à jour du Pokémon sélectionné
                     self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
                     self.attack_effect = None
                     self.defense_effect = None
 
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        # Vérifier clic sur flèche gauche
                         if arrow_left_rect.collidepoint(event.pos):
                             self.current_index = (self.current_index - 1) % len(self.pokemon_names)
                             self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
-                        # Vérifier clic sur flèche droite
                         elif arrow_right_rect.collidepoint(event.pos):
                             self.current_index = (self.current_index + 1) % len(self.pokemon_names)
                             self.selected_pokemon = Pokemon(self.pokemon_names[self.current_index])
-                        # Vérifier clic sur le bouton choose_poke
                         elif choose_poke_rect.collidepoint(event.pos):
                             game = Game(self.screen, self.selected_pokemon)
                             game.run()
                             running = False
 
-                        self.attack_effect = None
-                        self.defense_effect = None
+                    self.attack_effect = None
+                    self.defense_effect = None
 
-            # Incrémenter le compteur pour l'effet de pulsation
+            self.frame += 1
+
+    def open_pokedex(self, pokedex):
+        running = True
+        page = 0
+        items_per_page = 1
+        # Précharger les images et les redimensionner une seule fois
+        background = pygame.transform.scale(pygame.image.load('yellow_background.jpg'), (800, 600))  # Taille fixe pour optimisation
+        history_image = pygame.transform.scale(pygame.image.load('History_pokedex.png'), (400, 500))
+        arrow_left = pygame.transform.scale(pygame.image.load('arrow_left.png'), (50, 50))
+        arrow_right = pygame.transform.scale(pygame.image.load('arrow_right.png'), (50, 50))
+
+        # Police pour le nom du Pokémon (plus grande)
+        name_font = pygame.font.Font(None, 35)  # Taille plus grande
+        # Police pour les stats (plus petite)
+        stat_font = pygame.font.Font(None, 22)
+
+        while running:
+            # Effet de pulsation (optimisé)
+            scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
+            scaled_bg = pygame.transform.scale(background, (int(800 * scale_factor), int(600 * scale_factor)))  # Utiliser l'image préchargée
+            bg_rect = scaled_bg.get_rect(center=(400, 300))
+            self.screen.blit(scaled_bg, bg_rect.topleft)
+
+            self.screen.blit(history_image, (200, 80)) #Positionnement direct
+
+            captured_pokemon = pokedex.pokedex
+            start_index = page * items_per_page
+            end_index = min((page + 1) * items_per_page, len(captured_pokemon))
+
+            if captured_pokemon:
+                for i in range(start_index, end_index):
+                    pokemon_data = captured_pokemon[i]
+                    try:
+                        pokemon = Pokemon(pokemon_data["name"])
+                        if pokemon.image:
+                            scaled_image = pygame.transform.scale(pokemon.image, (150, 150))
+                            image_rect = scaled_image.get_rect(center=(400, 220))
+                            self.screen.blit(scaled_image, image_rect)
+
+                            # Nom du Pokémon (plus grand, noir)
+                            name_surface = name_font.render(pokemon.name.capitalize(), True, (0, 0, 0))
+                            name_rect = name_surface.get_rect(topleft=(260, 425))  # Position au-dessus des stats
+                            self.screen.blit(name_surface, name_rect)
+
+                            # Stats du Pokémon (plus petites, noires)
+                            y_offset = name_rect.bottom + 20  # Marge sous le nom
+                            for stat, value in pokemon.stats.items():
+                                stat_surface = stat_font.render(f"{stat.capitalize()}: {value}", True, (0, 0, 0))
+                                stat_rect = stat_surface.get_rect(topleft=(250, y_offset ))  # Centré horizontalement
+                                self.screen.blit(stat_surface, stat_rect)
+                                y_offset += 15  # Espacement entre les stats
+
+                        else:
+                            print(f"Error: Could not load image for {pokemon_data['name']}")
+                    except Exception as e:
+                        print(f"Error displaying Pokemon {pokemon_data['name']}: {e}")
+
+                # Afficher les flèches de navigation (une seule fois)
+                if len(captured_pokemon) > items_per_page:
+                    self.screen.blit(arrow_left, (50, 550))
+                    self.screen.blit(arrow_right, (700, 550))
+
+            else:
+                text_surface = name_font.render("No Pokémon captured yet!", True, (0, 0, 0)) #Utilisation de la police plus grande
+                text_rect = text_surface.get_rect(center=(400, 300))
+                self.screen.blit(text_surface, text_rect)
+
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if len(captured_pokemon) > items_per_page:
+                        if page > 0 and arrow_left.get_rect(topleft=(50, 550)).collidepoint(event.pos):
+                            page = max(0, page - 1)
+                        if end_index < len(captured_pokemon) and arrow_right.get_rect(topleft=(700, 550)).collidepoint(event.pos):
+                            page = min(page + 1, (len(captured_pokemon) - 1) // items_per_page)
+
             self.frame += 1
