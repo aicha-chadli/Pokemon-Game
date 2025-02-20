@@ -6,7 +6,6 @@ from game import Game
 from save_manager import SaveManager
 from pokedex import Pokedex
 
-
 class MainMenu:
     def __init__(self, screen):
         self.screen = screen
@@ -175,8 +174,15 @@ class MainMenu:
                 draw_text(self.screen, f"{stat.capitalize()}: {value}", 330, y_offset)
                 y_offset += 20
 
-            choose_poke_rect = self.choose_poke_image.get_rect(center=(400, y_offset + 40))
-            self.screen.blit(self.choose_poke_image, choose_poke_rect.topleft)
+            self.pulse_speed2 = 0.05  # Vitesse du pulsation du bouton
+            self.pulse_amplitude2 = 0.1  # Amplitude du pulsation
+            # Applique un effet pulse au bouton
+            scale_factor_button = 1 + math.sin(self.frame * self.pulse_speed2) * self.pulse_amplitude2
+            scaled_button = pygame.transform.scale(self.choose_poke_image, (int(self.choose_poke_image.get_width() * scale_factor_button), int(self.choose_poke_image.get_height() * scale_factor_button)))
+            choose_poke_rect = scaled_button.get_rect(center=(400, y_offset + 40))
+
+            self.screen.blit(scaled_button, choose_poke_rect.topleft)
+
 
             pygame.display.flip()
 
@@ -226,9 +232,7 @@ class MainMenu:
         pokedex.pokedex = pokedex._load_pokedex()  # Cette ligne recharge les données à chaque fois
         # Précharger les images et les redimensionner une seule fois
         background = pygame.transform.scale(pygame.image.load('yellow_background.jpg'), (800, 600))  # Taille fixe pour optimisation
-        history_image = pygame.transform.scale(pygame.image.load('History_pokedex.png'), (400, 500))
-        arrow_left = pygame.transform.scale(pygame.image.load('arrow_left.png'), (50, 50))
-        arrow_right = pygame.transform.scale(pygame.image.load('arrow_right.png'), (50, 50))
+        history_image = pygame.transform.scale(pygame.image.load('History_pokedex1.png'), (400, 500))
 
         # Police pour le nom du Pokémon (plus grande)
         name_font = pygame.font.Font(None, 35)  # Taille plus grande
@@ -237,12 +241,12 @@ class MainMenu:
 
         while running:
             # Effet de pulsation (optimisé)
-            scale_factor = 1 + math.sin(self.frame * self.pulse_speed1) * self.pulse_amplitude1
+            scale_factor = 1 + math.sin(self.frame * self.pulse_speed) * self.pulse_amplitude1
             scaled_bg = pygame.transform.scale(background, (int(800 * scale_factor), int(600 * scale_factor)))  # Utiliser l'image préchargée
             bg_rect = scaled_bg.get_rect(center=(400, 300))
             self.screen.blit(scaled_bg, bg_rect.topleft)
 
-            self.screen.blit(history_image, (200, 80)) #Positionnement direct
+            self.screen.blit(history_image, (200, 80))  # Positionnement direct
 
             captured_pokemon = pokedex.pokedex
             start_index = page * items_per_page
@@ -267,7 +271,7 @@ class MainMenu:
                             y_offset = name_rect.bottom + 20  # Marge sous le nom
                             for stat, value in pokemon.stats.items():
                                 stat_surface = stat_font.render(f"{stat.capitalize()}: {value}", True, (0, 0, 0))
-                                stat_rect = stat_surface.get_rect(topleft=(250, y_offset ))  # Centré horizontalement
+                                stat_rect = stat_surface.get_rect(topleft=(250, y_offset))  # Centré horizontalement
                                 self.screen.blit(stat_surface, stat_rect)
                                 y_offset += 15  # Espacement entre les stats
 
@@ -276,13 +280,8 @@ class MainMenu:
                     except Exception as e:
                         print(f"Error displaying Pokemon {pokemon_data['name']}: {e}")
 
-                # Afficher les flèches de navigation (une seule fois)
-                if len(captured_pokemon) > items_per_page:
-                    self.screen.blit(arrow_left, (50, 550))
-                    self.screen.blit(arrow_right, (700, 550))
-
             else:
-                text_surface = name_font.render("No Pokémon captured yet!", True, (0, 0, 0)) #Utilisation de la police plus grande
+                text_surface = name_font.render("No Pokémon captured yet!", True, (0, 0, 0))  # Utilisation de la police plus grande
                 text_rect = text_surface.get_rect(center=(400, 300))
                 self.screen.blit(text_surface, text_rect)
 
@@ -291,11 +290,11 @@ class MainMenu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                     running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if len(captured_pokemon) > items_per_page:
-                        if page > 0 and arrow_left.get_rect(topleft=(50, 550)).collidepoint(event.pos):
-                            page = max(0, page - 1)
-                        if end_index < len(captured_pokemon) and arrow_right.get_rect(topleft=(700, 550)).collidepoint(event.pos):
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:  # Flèche gauche
+                        page = max(0, page - 1)
+                    elif event.key == pygame.K_RIGHT:  # Flèche droite
+                        if end_index < len(captured_pokemon):
                             page = min(page + 1, (len(captured_pokemon) - 1) // items_per_page)
 
             self.frame += 1
