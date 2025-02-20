@@ -4,7 +4,6 @@ import pygame
 import random
 import math
 
-
 # Initialisation de Pygame (n'oublie pas d'appeler pygame.init() dans ton programme principal)
 pygame.init()
 

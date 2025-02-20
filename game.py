@@ -96,9 +96,19 @@ class Game:
             player_x, player_y = 60 + oscillation, 340 - oscillation
             opponent_x, opponent_y = 535 - oscillation, 100 + oscillation
 
+            # Actualizar las posiciones de los Pokémon para los efectos
+            self.player_pokemon.position = [player_x, player_y]
+            self.opponent_pokemon.position = [opponent_x, opponent_y]
+
+            # Actualizar los efectos visuales
+            self.combat.update_effects()
+
             # Dessiner les Pokémon avec leurs effets visuels
             self.player_pokemon.draw(self.screen, player_x, player_y)
             self.opponent_pokemon.draw(self.screen, opponent_x, opponent_y)
+
+            # Dibujar los efectos visuales
+            self.combat.draw_effects(self.screen)
 
             draw_text(self.screen, f"Your Pokémon: {self.player_pokemon.name.capitalize()}", 60, 540, 30)
             draw_text(self.screen, f"HP: {self.player_pokemon.stats['hp']}", 85, 565, 30)     # Affichage des points de vie

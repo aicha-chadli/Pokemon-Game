@@ -3,6 +3,7 @@ import os
 import requests
 import random
 from pokemon import Pokemon
+from effects import Effect
 
 TYPE_CHART_PATH = "type_chart.json"
 
@@ -67,6 +68,10 @@ class Combat:
     def __init__(self, player, enemy):
         self.player = player
         self.enemy = enemy
+        self.current_effects = []  # Lista para mantener los efectos activos
+        # Inicializar posiciones por defecto
+        self.player.position = [60, 340]
+        self.enemy.position = [535, 100]
 
     def damage_effectiveness(self, attack_type, defender):
         defender_types = defender.types if defender.types else ["normal"]
@@ -110,6 +115,11 @@ class Combat:
             # Mostrar el daño recibido
             defender.damage_text = str(damage)
             defender.damage_timer = 50  # Duración en frames (1 segundo a 60 FPS)
+            # Crear efecto visual basado en el tipo de ataque
+            effect_x = defender.position[0] if hasattr(defender, 'position') else 400
+            effect_y = defender.position[1] if hasattr(defender, 'position') else 300
+            effect = Effect(effect_x, effect_y, attack.attack_type)
+            self.current_effects.append(effect)
 
             # Appliquer un modificateur de stat si l'attaque en a un
             stat_change = None
@@ -125,3 +135,15 @@ class Combat:
         elif self.player.stats["hp"] <= 0:
             return self.enemy.name, self.player.name
         return None, None
+
+    def update_effects(self):
+        # Actualizar efectos existentes
+        for effect in self.current_effects[:]:  # Usar una copia de la lista para poder modificarla
+            effect.update()
+            if effect.is_finished():
+                self.current_effects.remove(effect)
+
+    def draw_effects(self, screen):
+        # Dibujar todos los efectos activos
+        for effect in self.current_effects:
+            effect.draw(screen)

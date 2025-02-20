@@ -76,7 +76,59 @@ class Effect:
                     'color': random.choice([(255,0,255), (238,130,238), (147,112,219)])
                 }
                 self.particles.append(particle)
-        
+
+        elif self.type_name == "ice":
+            # Cristales de hielo
+            for _ in range(15):
+                particle = {
+                    'x': self.x,
+                    'y': self.y,
+                    'dx': random.uniform(-1.5, 1.5),
+                    'dy': random.uniform(-1.5, 1.5),
+                    'size': random.randint(3, 7),
+                    'color': random.choice([(135,206,235), (173,216,230), (240,248,255)])
+                }
+                self.particles.append(particle)
+
+        elif self.type_name == "ground":
+            # Partículas de tierra
+            for _ in range(20):
+                particle = {
+                    'x': self.x,
+                    'y': self.y,
+                    'dx': random.uniform(-2, 2),
+                    'dy': random.uniform(-1, 3),
+                    'size': random.randint(2, 5),
+                    'color': random.choice([(139,69,19), (160,82,45), (210,180,140)])
+                }
+                self.particles.append(particle)
+
+        elif self.type_name == "flying":
+            # Corrientes de aire
+            for _ in range(15):
+                particle = {
+                    'x': self.x,
+                    'y': self.y,
+                    'dx': random.uniform(-3, 3),
+                    'dy': random.uniform(-3, 3),
+                    'size': random.randint(2, 4),
+                    'color': random.choice([(245,245,245), (220,220,220), (211,211,211)])
+                }
+                self.particles.append(particle)
+
+        elif self.type_name == "fighting":
+            # Impactos de energía
+            for _ in range(12):
+                particle = {
+                    'x': self.x,
+                    'y': self.y,
+                    'dx': random.uniform(-2.5, 2.5),
+                    'dy': random.uniform(-2.5, 2.5),
+                    'size': random.randint(3, 6),
+                    'color': random.choice([(178,34,34), (165,42,42), (220,20,60)])
+                }
+                self.particles.append(particle)
+
         else:
             # Efecto genérico (blanco)
             for _ in range(12):
@@ -109,6 +161,30 @@ class Effect:
                 speed = math.sqrt(particle['dx']**2 + particle['dy']**2)
                 particle['dx'] = speed * math.cos(angle)
                 particle['dy'] = speed * math.sin(angle)
+            elif self.type_name == "ice":
+                # Las partículas de hielo brillan y giran
+                particle['size'] = max(1, particle['size'] * 0.98)
+                angle = math.atan2(particle['dy'], particle['dx'])
+                angle += 0.05
+                speed = math.sqrt(particle['dx']**2 + particle['dy']**2)
+                particle['dx'] = speed * math.cos(angle)
+                particle['dy'] = speed * math.sin(angle)
+            elif self.type_name == "ground":
+                # Las partículas caen y rebotan
+                particle['dy'] += 0.2  # Gravedad
+                if particle['y'] > self.y + 20:  # Rebote
+                    particle['dy'] *= -0.5
+            elif self.type_name == "flying":
+                # Movimiento ondulatorio
+                particle['dx'] = 2 * math.sin(particle['y'] / 10)
+                particle['dy'] -= 0.1
+            elif self.type_name == "fighting":
+                # Explosión hacia afuera
+                speed = math.sqrt(particle['dx']**2 + particle['dy']**2)
+                if speed > 0:
+                    particle['dx'] *= 1.05
+                    particle['dy'] *= 1.05
+                particle['size'] = max(1, particle['size'] * 0.95)
 
     def draw(self, screen):
         for particle in self.particles:
