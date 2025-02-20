@@ -1,19 +1,33 @@
 [
     {
-        "name": "charizard",
+        "name": "dratini",
         "types": [
-            "fire",
-            "flying"
+            "dragon"
         ],
         "stats": {
-            "hp": 78,
-            "attack": 84,
-            "defense": 78,
-            "special-attack": 109,
-            "special-defense": 85,
-            "speed": 100
+            "hp": 41,
+            "attack": 64,
+            "defense": 45,
+            "special-attack": 50,
+            "special-defense": 50,
+            "speed": 50
         },
-        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/charizard.png"
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/dratini.png"
+    },
+    {
+        "name": "electrode",
+        "types": [
+            "electric"
+        ],
+        "stats": {
+            "hp": 60,
+            "attack": 50,
+            "defense": 70,
+            "special-attack": 80,
+            "special-defense": 80,
+            "speed": 150
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/electrode.png"
     },
     {
         "name": "weepinbell",
@@ -30,6 +44,7 @@
             "speed": 55
         },
         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/weepinbell.png"
+<<<<<<< HEAD
     },
     {
         "name": "drowzee",
@@ -153,5 +168,7 @@
             "speed": 40
         },
         "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/gloom.png"
+=======
+>>>>>>> 9e3415f4c89efe474529b799fc7a12bce0a97a2b
     }
 ]
