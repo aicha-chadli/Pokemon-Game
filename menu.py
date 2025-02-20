@@ -220,6 +220,9 @@ class MainMenu:
         running = True
         page = 0
         items_per_page = 1
+
+        # Recharger directement le Pokédex pour s'assurer que les données sont à jour
+        pokedex.pokedex = pokedex._load_pokedex()  # Cette ligne recharge les données à chaque fois
         # Précharger les images et les redimensionner une seule fois
         background = pygame.transform.scale(pygame.image.load('yellow_background.jpg'), (800, 600))  # Taille fixe pour optimisation
         history_image = pygame.transform.scale(pygame.image.load('History_pokedex.png'), (400, 500))
@@ -295,4 +298,3 @@ class MainMenu:
                             page = min(page + 1, (len(captured_pokemon) - 1) // items_per_page)
 
             self.frame += 1
-
