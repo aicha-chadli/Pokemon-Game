@@ -1,0 +1,18 @@
+[
+    {
+        "name": "tentacruel",
+        "types": [
+            "water",
+            "poison"
+        ],
+        "stats": {
+            "hp": 80,
+            "attack": 70,
+            "defense": 65,
+            "special-attack": 80,
+            "special-defense": 120,
+            "speed": 100
+        },
+        "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/tentacruel.png"
+    }
+]
